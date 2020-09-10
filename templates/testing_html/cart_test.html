@@ -1,0 +1,54 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+   
+    <title>Document</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+  <a class="navbar-brand" href="{% url 'product' %}">Shopping</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown"> 
+  </div>
+</nav>
+<div class="row" style="margin-top: 20px;">
+    {% for cart in object_list  %}
+    
+  <div class="card col-md-3">
+    <button type="button" class="close" aria-label="Close">
+        <span aria-hidden="true" class="float-right"><a class = "btn btn-danger"href="{% url 'cartdelete' cart.id %}">&times;</a></span>
+      </button>
+     <a class = "btn btn-danger"href="{% url 'product_details' cart.product.id %}" style="width: 100%;">
+            <img class="card-img-top" src="{{cart.product.image.url}}" height="300px" width="100px" alt="Card image cap">
+        </a>
+
+    <div class="card-body">
+      <h5 class="card-title">{{cart.product.name}}</h5>
+      <p class="card-text">{{cart.product.description}}</p>
+      <p class="card-text">Price_per_unit: Rs {{cart.price_per_unit}}</p>
+      <p class="card-text">Total_Price: {{cart.sub_total}} </p>
+      <form method="POST"> 
+                {% csrf_token %} 
+                
+                <p>Quantity: <input type="number" name="{{cart.product.name}}" value={{cart.quantity}}></p>
+                <button type="submit" class="btn btn-info">Update</button>
+            </form>  
+
+    </div>
+    
+  </div>
+  {% endfor %}
+  <div>
+  {% if cart_object.total %}
+  <h1><span style="color: crimson;">Total :</span> {{cart_object.total}}</h1>
+  {% endif %}
+  </div>
+    </div>
+
+</body>
+</html>

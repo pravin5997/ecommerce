@@ -1,0 +1,97 @@
+{% for product in prod %}
+{% load static %}
+{% if product.is_parent %}
+<div class="col-lg-4 col-md-6 item-entry mb-5">
+    <a href="{% url 'product_details' product.id %}">
+        <div style="height: 200px;">
+        <img src="{{product.image.url}}" style="height: 100%;" alt="Image"  class="img-fluid">
+        </div>
+    </a>
+    
+    <h1 class="item-title" style="font-size: 20px; padding-top: 20px; padding-bottom: 10px;">{{product.name}}</h1>
+    <p><strong class="item-price" id=price_{{product.id}}><i class='fa fa-inr' aria-hidden='true'></i>{{product.price}}</strong></p>
+   
+    <form method="POST" class="form"> 
+        {% csrf_token %}
+        {% for pro_attr in product.product_type.product_attribute.all%}
+        <h5>{{pro_attr.name}}</h5>
+        {% endfor %}
+        <div style="min-height: 170px; max-height: 250px; font-size: 14px;">
+            <ul>
+            
+            {% for child in product.parent.all %}
+                {% if product.parent.all.first == child %}
+                <li style="list-style: none;">
+                    <label for={{child.id}}>{{child.name}}</label>
+                    <input type="radio" id={{child.id}} name="child" my_cat = {{cat_obj.id}}  class="chil" value="{{child.id}}" checked>
+                </li>
+                {% else %}
+                <li style="list-style: none;">
+                    <label for={{child.id}}>{{child.name}}</label>
+                    <input type="radio" id={{child.id}} name="child" my_cat = {{cat_obj.id}} class="chil" value="{{child.id}}">
+                </li>
+                {% endif %}   
+            {% endfor %}
+            
+            </ul>
+        </div>
+        <div class="input-group mb-4" style="max-width: 120px;">
+                <div class="input-group-prepend">
+                <button class="btn btn-outline-primary js-btn-minus" type="button">&minus;</button>
+                </div>
+                <input type="text" class="form-control text-center" style="height:43px" name ="{{product.name|cut:' '}}" value=1 aria-label="Example text with button addon" aria-describedby="button-addon1">
+                <div class="input-group-append">
+                <button class="btn btn-outline-primary js-btn-plus" type="button">&plus;</button>
+                </div>
+            </div>
+        <button type="submit" class="btn btn-info">Add to Cart</button>
+    </form> 
+
+</div>
+{% endif %}
+{% endfor %}
+<script>
+$(document).ready(function(){
+    $('input[type=radio]').change(function(e){
+        var cates = $(this).attr('my_cat')
+        console.log(e.target.value)
+        e.preventDefault()
+        var radioValue = $("input[name='child']:checked").val()                
+        $.ajax({
+            type:'POST',
+            url: "/categorys/"+cates+"/",
+            data:{
+                'event':e.target.value,
+                csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+            },
+            success: function(result){
+                console.log(result.parent_prod)
+                var data = JSON.parse(result.prod_data)
+                var price = data[0].fields.price
+                var replace_price = document.getElementById('price_'+result.parent_prod) 
+                replace_price.innerHTML = "<i class='fa fa-inr' aria-hidden='true'></i>"+price
+                console.log("success")
+            },
+            error: function(error){
+                console.log("error",error)
+            },
+        });   
+    }); 
+
+    var sitePlusMinus = function() {
+		$('.js-btn-minus').on('click', function(e){
+			e.preventDefault();
+			if ( $(this).closest('.input-group').find('.form-control').val() != 0  ) {
+				$(this).closest('.input-group').find('.form-control').val(parseInt($(this).closest('.input-group').find('.form-control').val()) - 1);
+			} else {
+				$(this).closest('.input-group').find('.form-control').val(parseInt(0));
+			}
+		});
+		$('.js-btn-plus').on('click', function(e){
+			e.preventDefault();
+			$(this).closest('.input-group').find('.form-control').val(parseInt($(this).closest('.input-group').find('.form-control').val()) + 1);
+		});
+	};
+	sitePlusMinus();
+})
+</script>

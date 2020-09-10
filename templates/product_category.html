@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load mptt_tags %}
+{% block main %}
+  
+	<!-- Page Preloder -->
+<div id="preloder">
+  <div class="loader"></div>
+</div>
+<div class="site-wrap">  
+    {% include "navbar.html" %}
+	<div class="page-top-info">
+		<div class="container">
+			<h4>Category Page</h4>
+		</div>
+	</div>
+	<section class="category-section spad">
+		<div class="container">  
+			<div class="row">
+				<div class="col-lg-3 order-2 order-lg-1">
+					<div class="filter-widget">
+						<h2 class="fw-title">Categories</h2>
+						<ul class="category-menu">
+                        {% recursetree cates %}
+                            <li>
+                                <a href="{% url 'testing' node.id %}">{{ node.name }}</a> 
+                                {% if not node.is_leaf_node %}
+                                    <ul class="sub-menu" style="padding-left: 20px;">
+                                      <ul class="category-menu">{{ children }}</ul>
+                                      
+                                    </ul>
+                                {% endif %}
+                            </li>
+                        {% endrecursetree %}
+						</ul>
+                    </div>
+                    <div class="filter-widget">
+                         {% for m in pro_attr %}
+                        <h2 class="fw-title" style="padding-top: 20px;">{{m.name}}</h2>
+                        <ul class="category-menu">
+                            {% for n in m.product_attribute_value.all|dictsort:'name' %}
+                            {% ifchanged %}
+                            <li><label for="{{n.name}}">{{n.name}}</label>
+                            <input type="checkbox" class="checkallusers" id="{{n.name}}"  name="{{cat_obj.id}}"  value="{{n.name}}">
+                            </li>
+                            {% endifchanged %}
+                             {% endfor %}
+						</ul>
+                        {% endfor %}
+                    </div>     
+                </div>
+				<div class="col-lg-9  order-1 order-lg-2 mb-5 mb-lg-0">
+					<div class="row" id = 'countid'>
+                        {% include "product.html" %}
+              
+					</div>
+				</div>
+			</div>
+		</div>
+    </section>
+    {% include "footer.html" %}
+    </div>
+{% endblock %}
+ {% block script %}
+
+<script>
+$(document).ready(function($){
+    $('input[type=radio]').change(function(e){
+        var cates = $(this).attr('my_cat')
+        console.log(e.target.value)
+        e.preventDefault()
+        var radioValue = $("input[name='child']:checked").val()                
+        $.ajax({
+            type:'POST',
+            url: "/categorys/"+cates+"/",
+            data:{
+                'event':e.target.value,
+                csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+            },
+            
+            success: function(result){
+                console.log(result.parent_prod)
+                var data = JSON.parse(result.prod_data)
+                var price = data[0].fields.price
+                var replace_price = document.getElementById('price_'+result.parent_prod) 
+                replace_price.innerHTML = "<i class='fa fa-inr' aria-hidden='true'></i>"+price
+                console.log("success")
+            },
+            error: function(error){
+                console.log("error",error)
+            },
+        });   
+    }); 
+
+})
+</script>
+<script>
+    $(document).ready( function ($) {	
+	var all_pro = []
+	$(".checkallusers").change(function(e){
+
+    var cates = e.target.name
+     e.preventDefault()
+     var checked = $(this).is(':checked');
+      if(checked){
+          all_pro.push(e.target.value)
+      }
+      else{
+          var a = all_pro.indexOf(e.target.value)
+          all_pro.splice(a, 1)
+      }
+      console.log(all_pro)
+      $.ajax({
+            type:'GET',
+            url: "/category/"+cates+"/prod/",
+            data:{
+                'pro_attr_val':all_pro  
+            },
+            async:false,
+            success: function(result){
+                $('#countid').html(result.data_string)
+                console.log("success")
+            },
+            error: function(error){
+                console.log("error",error)
+            },
+        });
+    });
+});
+</script>
+{% endblock %}

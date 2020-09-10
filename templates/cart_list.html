@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+{% block main %}
+<div id="preloder">
+	<div class="loader"></div>
+</div>
+<div class="site-wrap">
+    {% include "navbar.html" %}
+    <div class="page-top-info">
+		<div class="container">
+			<h4>Your cart</h4>
+			<div class="site-pagination" style="padding-top: 20px;">
+				<a href="{% url 'product' %}">Home</a> /
+				<a href="">cart</a>
+			</div>
+		</div>
+  </div>
+   {% if cart_count.count != 0 %}
+    <section class="cart-section spad" id = "cart_section">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="cart-table">
+						<div class="cart-table-warp">
+             
+							<table>
+							<thead>
+								<tr>
+									<th class="product-th" style="font-size: 20px;">Product</th>
+									<th class="quy-th" style="font-size: 20px;">Quantity</th>
+									<th class="size-th" style="font-size: 20px;">Update</th>
+                  <th class="total-th" style="font-size: 20px;">Price</th>
+                  <th></th>
+								</tr>
+							</thead>
+							<tbody>
+                 {% for cart in cart_count  %}
+								<tr id = {{cart.id}}>
+									<td class="product-col">
+                    <a href="{% url 'product_details' cart.product.product.id %}">
+                      
+                    <img src="{{cart.product.image.url}}"  style="border-radius: 8px;" alt="....">
+                  
+                    </a>
+										<div class="pc-title">
+											<h4>{{cart.product.name}}</h4>
+											<p><i class="fa fa-inr" aria-hidden="true"></i>{{cart.price_per_unit}}</p>
+										</div>
+                  </td>
+                  <form method="POST"> 
+                        {% csrf_token %} 
+									  <td class="quy-col">
+                      <div class="quantity">
+                        <div class="pro-qty">
+                          <input type="text" class="quanti" id = "quanti" name="{{cart.product.name}}" value={{cart.quantity}}>
+                        </div>
+                      </div>	
+                    </td>
+                    <td><button type="submit" class="btn btn-info" style="margin-left: 40px; height: 35px;">Update</button></td>
+                  </form> 
+                  <td class="total-col"><h4><i class="fa fa-inr" aria-hidden="true"></i>{{cart.sub_total}}</h4></td>
+                  <td style="padding-left: 25px;"><a href="" id = {{cart.id}}  class="btn btn-primary height-auto btn-sm del" style="background-color: transparent; color: #414141; border: none; font-size: 18px;">X</a></td>
+								</tr>
+						 {% endfor %}
+							</tbody>
+						</table>
+						</div>
+					</div>
+        </div>
+			</div>
+		</div>
+  </section>
+    <div id= "check"> 
+    <div class="site-section" style="padding:0px; padding-bottom: 30px;">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+              <div class="row mb-5">
+              <div class="col-md-6">
+                <a href="{% url 'product' %}" style="padding: 11px;" class="btn btn-outline-primary btn-sm btn-block">Continue Shopping</a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <label class="text-black h4" for="coupon">Coupon</label>
+                <!-- <div id = "success">
+                  <p class="alert alert-success" hidden><p>
+                </div> -->
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" id="message_container" role="alert">
+                  {{ message }}
+                </div>
+                {% endfor %}
+              {% endif %} 
+              </div>
+              <form method="POST">
+                 {% csrf_token %}
+                <div class="row">
+                
+              <div class="col-md-8" style="padding-left: 30px;">
+                <input type="text" class="form-control py-3" name = "coupon" id="coupon" placeholder="Enter Coupon Code">
+              </div>
+              <div class="col-md-4">
+                <button type="submit" id = "my_coupon" class="btn btn-primary btn-sm px-4" style="height: 38px;">Apply Coupon</button>
+              </div>
+             
+              </div>
+              </form>
+            </div>
+          </div>
+          <div class="col-md-6 pl-5">
+            <div class="row justify-content-end">
+              <div class="col-md-7">
+                
+                <div class="row">
+                  <div class="col-md-12 text-right border-bottom mb-5">
+                    <h3 class="text-black h4 text-uppercase">Cart Totals</h3>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <span class="text-black">Subtotal</span>
+                  </div>
+                  <div class="col-md-6 text-right">
+                    <strong class="text-black" id="sub_total"><i class="fa fa-inr" aria-hidden="true"></i>{{cart_object.total}}</strong>
+                  </div>
+                </div>
+                <!-- <div class="row mb-5">
+                  <div class="col-md-6">
+                    <span class="text-black">Discount</span>
+                  </div>
+                  <div class="col-md-6 text-right">
+                    <strong class="text-black" id ="discount"><i class="fa fa-inr" aria-hidden="true"></i>{{cart_object.total_discount}}</strong>
+                  </div>
+                </div> -->
+                <!-- <div id = "show_coupon">
+                <div class="row mb-5" hidden>
+                  <div class="col-md-12">
+                    <div class="alert alert-success">
+                      <button class="btn btn-danger" style="float: right; height: 20px; font-size:12px; padding-top: 2px;">X</button>
+                      <p></p>   
+                    </div> 
+                  </div>
+                </div>
+                </div> -->
+                {% if cart_object.coupon %}
+                 <div class="row mb-5" id = "coopon_disc">
+                  <div class="col-md-12">
+                    <div class="alert alert-success row" style="padding-right: 5px;">
+                      <div class="col-md-12" style="padding: 0px !important; margin-bottom: 5px; margin-right: 0;">
+                        <a class="btn btn-danger" href="{% url 'remove_code' cart_object.id %}" style="float: right; height: 20px; font-size:12px; padding-top: 2px;">X</a>
+                      </div>
+                      <div class="col-md-6" style="color: rgb(35, 221, 119) !important;">
+                        <span >Promo code</span>
+                        <span >{{cart_object.coupon.code}}</span>
+                      </div>
+                      <div class="col-md-6 text-right" style="color: rgb(35, 221, 119) !important;">
+                        <strong id ="my_discount" >-<i class="fa fa-inr" aria-hidden="true"></i>{{cart_object.total_discount}}</strong>
+                      </div>
+                    </div> 
+                  </div>
+                </div>
+             
+                {% endif %}
+                
+                <div class="row mb-5">
+                  <div class="col-md-6">
+                    <span class="text-black">Total</span>
+                  </div>
+                  <div class="col-md-6 text-right">
+                    <strong class="text-black" id="total"><i class="fa fa-inr" aria-hidden="true"></i>{{cart_object.get_total}}</strong>
+                  </div>
+                </div>
+                
+                <div class="row">
+                  <div class="col-md-12">
+                    <button class="btn btn-primary btn-lg btn-block" ><a href="{% url 'shipping_address' %}" id= "order" style="color: #fff;">Proceed To Checkout</a></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+      {% else %}
+    <div class="site-section" style="padding: 30px;">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12 text-center">
+            <div><img src="https://rukminim1.flixcart.com/www/800/800/promos/16/05/2019/d438a32e-765a-4d8b-b4a6-520b560971e8.png?q=90" alt=".."  height="20%" width="20%"></div>
+            <p class="lead mb-5">Your Shopping Cart is empty.</p>
+            <p><a href="{% url 'product' %}" class="btn btn-sm height-auto px-5 py-2 btn-primary">Back to shop</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+    {% include "footer.html" %}
+  </div>
+{% endblock %}
+ {% block script %}
+<script>
+$(document).ready(function(){
+    $('.del').click(function(e){
+        e.preventDefault()
+       $.ajax({
+            type:'GET',
+            url: '{% url "crud_ajax_delete" %}',
+            data:{"id":e.target.id},
+            dataType: 'json',
+            success: function (data) {
+              console.log(data.cart_item)
+              if (data.cart_item == 0) 
+              { 
+                $('#cart_section').hide()
+                $('#check').html(`<div class="site-section" style="padding: 30px;">
+                                    <div class="container">
+                                      <div class="row">
+                                        <div class="col-md-12 text-center">
+                                          <div><img src="https://rukminim1.flixcart.com/www/800/800/promos/16/05/2019/d438a32e-765a-4d8b-b4a6-520b560971e8.png?q=90" alt=".."  height="20%" width="20%"></div>
+                                          <p class="lead mb-5">Your Shopping Cart is empty.</p>
+                                          <p><a href="{% url 'product' %}" class="btn btn-sm height-auto px-5 py-2 btn-primary">Back to shop</a></p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>`)
+
+                var cart_count = document.getElementById("count")
+                cart_count.innerHTML = data.cart_item
+                
+              }
+              else
+              {
+                $("#"+data.id).remove();
+                var cart_count = document.getElementById("count")
+                cart_count.innerHTML = data.cart_item
+                
+
+                if (data.cart_sub_total == data.cart_total){
+                  $("#coopon_disc").hide()
+                }
+                
+                $('#my_discount').html("-<i class='fa fa-inr' aria-hidden='true'></i>"+data.cart_discount)
+                $('#sub_total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.cart_sub_total)
+                $('#total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.cart_total) 
+                $('#show_coupon').html('<div class="row mb-5" '+data.my_tag+'></div>')
+                $('#success').html('<p class="alert alert-" +'+data.my_tag+'><p>')
+                document.getElementById("coupon").value = "";
+                $('#discount').html("<i class='fa fa-inr' aria-hidden='true'></i>"+0)
+              }
+        }
+        });    
+    });  
+
+    // $('#my_coupon').click(function(e){
+    //   e.preventDefault()
+    //   var a = document.getElementById("coupon").value;
+    //   $.ajax({
+    //       type:'POST',
+    //       url: '{% url "cartlists" %}',
+    //       data:{"coupon":a,
+    //             csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+    //             },
+    //       success: function (data) {
+    //         $('#sub_total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.sub_total)
+    //         $('#total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.total_price) 
+    //         $('#discount').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.total_discount)
+    //         $('#success').html('<p class="alert alert-'+data.message_tag+'">'+data.message+'<p>')
+    //         $('#show_coupon').html('<div class="row mb-5" '+data.div_tag+'><div class="col-md-12"><div class="alert alert-success"><button class="btn btn-danger"  id = "remove" style="float: right; height: 20px; font-size:12px; padding-top: 2px;">X</button><p>coupon '+data.code+' is apply<br>'+data.code_dec+'</p></div></div></div>')
+    //       console.log("success")
+    //       }
+    //     });    
+    // });
+
+    $('#show_coupon').click(function(e){
+        e.preventDefault()
+          $.ajax({
+          type:'POST',
+          url: '{% url "cartlists" %}',
+          data:{"code_remove": "remove",
+                csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+                },
+          success: function (data) {
+          $('#sub_total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.total_price)
+          $('#total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.total_price) 
+          $('#discount').html("<i class='fa fa-inr' aria-hidden='true'></i>"+0)
+          $('#success').html('<p class="alert alert-" hidden><p>')
+          document.getElementById("coupon").value = "";
+          $('#show_coupon').html('<div class="row mb-5" hidden>')
+          console.log("success")
+          }
+        });
+     }); 
+
+     $('#order').click(function(e){
+        var c= document.getElementById("coupon").value;
+        
+         $.ajax({
+          type:'POST',
+          url: '{% url "cartlists" %}',
+          data:{"order": c,
+                csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+                },
+          success: function (data) {
+          console.log("success")
+          }
+        });
+         
+     });
+
+       $('.dec').click( function (e) {
+        e.preventDefault()
+        console.log(e.target)
+        var a = document.getElementsByClassName("quanti")
+        console.log(a[0].value)
+        });        
+})
+</script>
+<script>
+  var message_ele = document.getElementById("message_container");
+  setTimeout(function(){ 
+    message_ele.style.display = "none"; 
+  }, 5000);
+</script>
+{% endblock %}

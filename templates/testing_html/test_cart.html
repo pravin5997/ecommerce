@@ -1,0 +1,264 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>ShopMax &mdash; Colorlib e-Commerce Template</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mukta:300,400,700">
+    <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/aos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap-grid.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap-reboot.css' %}">
+
+
+  <link rel="stylesheet" href="{% static 'cart/css/bootstrap.min.css' %}"/>
+	<link rel="stylesheet" href="{% static 'cart/css/font-awesome.min.css' %}"/>
+	<link rel="stylesheet" href="{% static 'cart/css/flaticon.css' %}"/>
+	<link rel="stylesheet" href="{% static 'cart/css/slicknav.min.css' %}"/>
+	<link rel="stylesheet" href="{% static 'cart/css/jquery-ui.min.css' %}"/>
+	<link rel="stylesheet" href="{% static 'cart/css/owl.carousel.min.css' %}"/>
+	<link rel="stylesheet" href="{% static 'cart/css/animate.css' %}"/>
+	<link rel="stylesheet" href="{% static 'cart/css/style.css' %}"/>
+  </head>
+  <body>
+
+    <div id="preloder">
+		<div class="loader"></div>
+	</div>
+	<!-- cart section end -->
+	<section class="cart-section spad">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-9">
+					<div class="cart-table">
+						<h3>Your Cart</h3>
+						<div class="cart-table-warp">
+							<table>
+							<thead>
+								<tr>
+                  
+									<th class="product-th">Product</th>
+									<th class="quy-th">Quantity</th>
+									<th class="size-th">SizeSize</th>
+                  <th class="total-th">Price</th>
+                  <th></th>
+                 
+								</tr>
+							</thead>
+							<tbody>
+                 {% for cart in object_list  %}
+								<tr>
+									<td class="product-col">
+										<img src="{{cart.product.image.url}}" alt="">
+										<div class="pc-title">
+											<h4>{{cart.product.name}}</h4>
+											<p>{{cart.price_per_unit}}</p>
+										</div>
+                  </td>
+                  <form method="POST"> 
+                        {% csrf_token %} 
+									  <td class="quy-col">
+                      <div class="quantity">
+                        <div class="pro-qty">
+                          <input type="text"  name="{{cart.product.name}}" value={{cart.quantity}} >
+                        </div>
+                      </div>	
+                    </td>
+                    <td class="size-col"><button type="submit" class="btn btn-info">Update</button></td>
+                  </form> 
+                  <td class="total-col"><h4>{{cart.sub_total}}</h4></td>
+                  <td style="padding-left: 25px;"><a href="{% url 'cartdelete' cart.id %}" class="btn btn-primary height-auto btn-sm" style="background-color: transparent; color: #414141; border: none; font-size: 18px;">X</a></td>
+								</tr>
+						 {% endfor %}
+							</tbody>
+						</table>
+						</div>
+						<div class="total-cost">
+							<h6>Total <span>{{cart_object.total}}</span></h6>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 card-right">
+					<form class="promo-code-form">
+						<input type="text" placeholder="Enter promo code">
+						<button>Submit</button>
+					</form>
+					<a href="" class="site-btn">Proceed to checkout</a>
+					<a href="" class="site-btn sb-dark">Continue shopping</a>
+				</div>
+			</div>
+		</div>
+	</section>
+  
+  <div class="site-wrap">
+   <div class="site-navbar bg-white py-2" style="background: #f0f4f6b8 !important;">
+
+      <div class="search-wrap">
+        <div class="container">
+          <a href="#" class="search-close js-search-close"><span class="icon-close2"></span></a>
+          <form action="#" method="post">
+            <input type="text" class="form-control" placeholder="Search keyword and hit enter...">
+          </form>  
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="logo">
+            <div class="site-logo">
+              <a href="{% url 'product' %}" class="js-logo-clone">NIVIDATA</a>
+            </div>
+          </div>
+          
+          <div class="icons">
+            <a href="#" class="icons-btn d-inline-block js-search-open"><span class="icon-search"></span></a>
+            <a href="#" class="icons-btn d-inline-block"><span class="icon-heart-o"></span></a>
+            <a href="{% url 'cartlists' %}" class="icons-btn d-inline-block bag">
+              <span class="icon-shopping-bag"></span>
+              <span class="number">{{object_list.count}}</span>
+            </a>
+            <a href="#" class="site-menu-toggle js-menu-toggle ml-3 d-inline-block d-lg-none"><span class="icon-menu"></span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="site-section">
+      <div class="container">
+        <div class="row mb-5">
+          <form class="col-md-12" method="post">
+            <div class="site-blocks-table">
+              <table class="table table-bordered">
+                <thead>
+                
+                  <tr>
+                    <th class="product-thumbnail">Image</th>
+                    <th class="product-name">Product</th>
+                    <th class="product-price">Price</th>
+                    <th class="product-quantity">Quantity</th>
+                    <th class="product-total">Total</th>
+                    <th class="product-remove">Remove</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for cart in object_list  %}
+                  <tr>
+                    <td class="product-thumbnail">
+                      <img src="{{cart.product.image.url}}" alt="Image" class="img-fluid">
+                    </td>
+                    <td class="product-name">
+                      <h2 class="h5 text-black">{{cart.product.name}}</h2>
+                    </td>
+                    <td>{{cart.price_per_unit}}</td>
+                    <td>
+                    <form method="POST"> 
+                        {% csrf_token %} 
+                
+                      <div class="input-group mb-3" style="max-width: 120px;">
+                        <div class="input-group-prepend">
+                          <button class="btn btn-outline-primary js-btn-minus" type="button">&minus;</button>
+                        </div>
+                        <input type="text" class="form-control text-center" name="{{cart.product.name}}" value={{cart.quantity}} aria-label="Example text with button addon" aria-describedby="button-addon1">
+                        <div class="input-group-append">
+                          <button class="btn btn-outline-primary js-btn-plus" type="button">&plus;</button>
+                        </div>
+                      </div>
+                    <button type="submit" class="btn btn-info">Update</button>
+                    </form> 
+                    </td>
+                    <td>{{cart.sub_total}}</td>
+                    <td><a href="{% url 'cartdelete' cart.id %}" class="btn btn-primary height-auto btn-sm">X</a></td>
+                  </tr>
+
+                {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </form>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+              <div class="row mb-5">
+              <div class="col-md-6">
+                <a href="{% url 'product' %}" style="padding: 11px;" class="btn btn-outline-primary btn-sm btn-block">Continue Shopping</a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <label class="text-black h4" for="coupon">Coupon</label>
+                <p>Enter your coupon code if you have one.</p>
+              </div>
+              <div class="col-md-8 mb-3 mb-md-0">
+                <input type="text" class="form-control py-3" id="coupon" placeholder="Coupon Code">
+              </div>
+              <div class="col-md-4">
+                <button class="btn btn-primary btn-sm px-4">Apply Coupon</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 pl-5">
+            <div class="row justify-content-end">
+              <div class="col-md-7">
+                <div class="row">
+                  <div class="col-md-12 text-right border-bottom mb-5">
+                    <h3 class="text-black h4 text-uppercase">Cart Totals</h3>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <span class="text-black">Subtotal</span>
+                  </div>
+                  <div class="col-md-6 text-right">
+                    <strong class="text-black">{{cart_object.total}}</strong>
+                  </div>
+                </div>
+                <div class="row mb-5">
+                  <div class="col-md-6">
+                    <span class="text-black">Total</span>
+                  </div>
+                  <div class="col-md-6 text-right">
+                    <strong class="text-black">{{cart_object.total}}</strong>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-12">
+                    <button class="btn btn-primary btn-lg btn-block">Proceed To Checkout</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+  <script src="{% static 'js/jquery-ui.js' %}"></script>
+  <script src="{% static 'js/popper.min.js' %}"></script>
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+  <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+  <script src="{% static 'js/aos.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+
+  <script src="{% static 'cart/js/jquery-3.2.1.min.js' %}"></script>
+	<script src="{% static 'cart/js/bootstrap.min.js' %}"></script>
+	<script src="{% static 'cart/js/jquery.slicknav.min.js' %}"></script>
+	<script src="{% static 'cart/js/owl.carousel.min.js' %}"></script>
+	<script src="{% static 'cart/js/jquery.nicescroll.min.js' %}"></script>
+	<script src="{% static 'cart/js/jquery.zoom.min.js' %}"></script>
+	<script src="{% static 'cart/js/jquery-ui.min.js' %}"></script>
+	<script src="{% static 'cart/js/main.js' %}"></script>
+    
+  </body>
+</html>

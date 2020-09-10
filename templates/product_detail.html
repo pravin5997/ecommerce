@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block main %}
+<div id="preloder">
+		<div class="loader"></div>
+	</div>
+<div class="site-wrap">
+    {% include "navbar.html" %}
+    <div class="page-top-info">
+		<div class="container">
+			<h4>Product Page</h4>
+			<!-- <div class="site-pagination" style="padding-top: 20px;">
+				<a href="{% url 'product' %}">Home</a> /
+                <a href="">category</a> /
+                <a href="">subcategory</a> /
+                <a href="">product</a>
+			</div> -->
+		</div>
+	</div>
+
+    <div class="site-section" > 
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="item-entry">
+              <a href="#" class="product-item md-height bg-gray d-block" style="background: #f6e7e7; border-radius: 12px;">
+                <img src="{{product.image.url}}" alt="Image" style="height: auto; width: 100%;" class="img-fluid">
+              </a>
+              
+            </div>
+
+          </div>
+          <div class="col-md-6">
+            <h4 class="text-black">{{product.name}}</h4>
+            <p>{{product.description}}</p>
+            <p><strong class="text-primary h4" id="price">Rs. {{product.price}}</strong></p>
+             <form method="POST"> 
+                {% csrf_token %}
+                {% for pro_attr in product.product_type.product_attribute.all%}
+                <h5><b>{{pro_attr.name}}</b></h5>
+                {% endfor %}
+                <div>
+                    {% for child in product.parent.all %}
+                        {% if product.parent.all.first == child %}
+                            <label for={{child.id}}>{{child.name}}</label>
+                            <input type="radio" id={{child.id}} name="child" class="chil" value="{{child.id}}" checked><br>
+                        {% else %}
+                            <label for={{child.id}}>{{child.name}}</label>
+                            <input type="radio" id={{child.id}} name="child" class="chil" value="{{child.id}}"><br>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                 <div class="mb-5">
+              <div class="input-group mb-3" style="max-width: 120px;">
+              <div class="input-group-prepend">
+                <button class="btn btn-outline-primary js-btn-minus" type="button">&minus;</button>
+              </div>
+              <input type="text" class="form-control text-center" style="height:43px" name ="{{product.name|cut:' '}}" value=1 aria-label="Example text with button addon" aria-describedby="button-addon1">
+              <div class="input-group-append">
+                <button class="btn btn-outline-primary js-btn-plus" type="button">&plus;</button>
+              </div>
+            </div>
+            </div>
+                <button type="submit" class="buy-now btn btn-sm height-auto px-4 py-3 btn-primary">Add to Cart</button>
+            </form>   
+        
+          </div>
+        </div>
+      </div>
+    </div>
+    {% include "footer.html" %}
+</div>
+{% endblock %}
+ {% block script %}
+<script>
+$(document).ready(function(){
+    $('input[type=radio]').change(function(e){
+        e.preventDefault()
+        var radioValue = $("input[name='child']:checked").val()
+        console.log(radioValue)             
+        $.ajax({
+            type:'POST',
+            url: "/"+radioValue+"/",
+            data:{
+                "event":radioValue,
+                csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+            },
+            success: function(result){
+                var data = JSON.parse(result.prod_data)
+                var price = data[0].fields.price
+                var replace_price = document.getElementById('price') 
+                replace_price.innerHTML ="Rs. "+ price
+                console.log("success")
+            },
+            error: function(error){
+                console.log("error", error)
+            }, 
+        });   
+    });
+})
+</script>
+{% endblock %}

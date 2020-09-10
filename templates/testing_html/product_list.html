@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="row" id ='productid' style="margin-top: 20px; margin-left: 0; margin-right: 0;">                     
+        {% include 'product.html' %}
+</div>   
+{% endblock %}
+ {% block script %}
+
+<script>
+$(document).ready(function(){
+    $('input[type=radio]').change(function(e){
+        console.log(e.target.value)
+        e.preventDefault()
+        var radioValue = $("input[name='child']:checked").val()                
+        $.ajax({
+            type:'POST',
+            url: "/",
+            data:{
+                'event':e.target.value,
+                csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+            },
+            success: function(result){
+                console.log(result.parent_prod)
+                var data = JSON.parse(result.prod_data)
+                var price = data[0].fields.price
+                var replace_price = document.getElementById('price_'+result.parent_prod) 
+                replace_price.innerHTML = "Price: Rs" + price
+                console.log("success")
+            },
+            error: function(error){
+                console.log("error",error)
+            },
+        });   
+    });  
+})
+</script>
+
+{% endblock %}

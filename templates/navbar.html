@@ -1,0 +1,47 @@
+{% load mptt_tags %}
+<div class="site-navbar bg-white py-2" style="background: #f0f4f6b8 !important;">
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="logo">
+            <div class="site-logo">
+              <a href="{% url 'product' %}" style="padding-top: 6px; padding-bottom: 6px;" class="js-logo-clone">NIVIDATA</a>
+            </div>
+          </div>
+          <div class="main-nav d-none d-lg-block">
+            <nav class="site-navigation text-right text-md-center" role="navigation">
+              <ul class="site-menu js-clone-nav d-none d-lg-block">
+                <li class="has-children active">
+                  <a href="#">Category</a>
+                    <ul class="dropdown">
+                        {% recursetree cates %}
+                            <li class="has-children" id ={{node.id}} style="padding: 5px;">
+                                <a href="{% url 'testing' node.id %}">{{ node.name }}</a> 
+                                {% if not node.is_leaf_node %}
+                                    <ul class="children dropdown">
+                                      {{ children }}
+                                    </ul>
+                                {% endif %}
+                            </li>
+                        {% endrecursetree %}
+                    </ul>
+                </li>
+                
+                <li><a href="#">Shop</a></li>
+                <li><a href="#">Catalogue</a></li>
+                <li><a href="#">New Arrivals</a></li>
+                <li><a href="#">Contact</a></li>
+              </ul>
+            </nav>
+          </div>
+          <div class="icons">
+            <a href="#" class="icons-btn d-inline-block js-search-open"><span class="icon-search"></span></a>
+            <a href="#" class="icons-btn d-inline-block"><span class="icon-heart-o"></span></a>
+            <a href="{% url 'cartlists' %}" class="icons-btn d-inline-block bag">
+              <span class="icon-shopping-bag"></span>
+              <span class="number" id = "count">{{cart_count.count}}</span>
+            </a>
+            <a href="#" class="site-menu-toggle js-menu-toggle ml-3 d-inline-block d-lg-none"><span class="icon-menu"></span></a>
+          </div>
+        </div>
+      </div>
+    </div>

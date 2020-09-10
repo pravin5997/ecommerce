@@ -1,0 +1,26 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <title>Document</title>
+</head>
+<body>
+  
+ <div class="col-md-12">
+         
+          <form method="POST" action="">
+              <div class="container">
+              {% csrf_token %} 
+              <h1>Are you sure delete this content</h1>
+            <button type="submit" class="btn btn-primary">Delete</button>
+            <a href="/cartlist/" class="btn btn-primary">Cencal</a>  
+            
+              </div>
+             
+          </form>
+        </div>
+
+</body>
+</html>

@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load mptt_tags %}
+
+{% block main %}
+<div id="preloder">
+  <div class="loader"></div>
+</div>
+<div class="site-wrap">  
+    {% include "navbar.html" %}
+    <div class="site-blocks-cover" data-aos="fade">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 ml-auto order-md-2 align-self-start" >
+            <div class="site-block-cover-content">
+            <h2 class="sub-title">#New monsoon Collection 2020</h2>
+            <h1>Arrivals Sales</h1>
+            <p><a href="{% url 'product' %}" class="btn btn-black rounded-0">Shop Now</a></p>
+            </div>
+          </div>
+          <div class="col-md-6 order-1 align-self-end" style="height: 500px;">
+            <img src="{% static 'images/f.jpg' %}" alt="Image" style="height: 100%;"  class="img-fluid">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="site-section">
+      <div class="container">
+        <div class="row">
+          <div class="title-section mb-5 col-12">
+            <h2 class="text-uppercase">All Products</h2>
+          </div>
+        </div>
+        <div class="row">
+          {% for product in object_list %}
+            {% if product.is_parent %}
+          <div class="col-lg-4 col-md-6 item-entry mb-5">
+            <a href="{% url 'product_details' product.id %}">
+              <div style="height: 200px;">
+              <img src="{{product.image.url}}" alt="Image" style="height: 100%;"  class="img-fluid">
+              </div>
+            </a>
+            <h4 class="item-title" style="font-size: 25px; padding-top: 20px;">{{product.name}}</h4><br>
+            <p><strong class="item-price" id=price_{{product.id}}>RS. {{product.price}}</strong></p>
+            <form method="POST" class="form"> 
+                {% csrf_token %}
+                <div style="height: 50px;">
+                {% for pro_attr in product.product_type.product_attribute.all%}
+                <h5>{{pro_attr.name}}</h5>
+                {% endfor %} 
+                </div>
+                <div  style="min-height: 170px; max-height: 210px; font-size: 14px;">
+                    <ul>
+                    {% for child in product.parent.all %}
+                        {% if product.parent.all.first == child %}
+                        <li style="list-style: none;">
+                            <label for="{{child.id}}">{{child.name}}</label>
+                            <input type="radio" id="{{child.id}}" name="child" class="chil" value="{{child.id}}" checked>
+                        </li>
+                        {% else %}
+                        <li style="list-style: none;">
+                            <label for="{{child.id}}">{{child.name}}</label>
+                            <input type="radio" id="{{child.id}}" name="child" class="chil" value="{{child.id}}">
+                        </li>
+                        {% endif %}   
+                    {% endfor %}
+                    </ul>
+                </div>
+                
+                <div class="input-group mb-3" style="max-width: 120px;">
+                        <div class="input-group-prepend">
+                          <button class="btn btn-outline-primary js-btn-minus" type="button">&minus;</button>
+                        </div>
+                        <input type="text" class="form-control text-center"  style="height:43px" name ="{{product.name|cut:' '}}" value=1 aria-label="Example text with button addon" aria-describedby="button-addon1">
+                        <div class="input-group-append">
+                          <button class="btn btn-outline-primary js-btn-plus" type="button">&plus;</button>
+                        </div>
+                      </div>
+                <button type="submit" class="btn btn-info">Add to Cart</button>
+            </form> 
+</div>
+         {% endif %}
+{% endfor %}
+        </div>
+      </div>
+    </div> 
+       {% include "footer.html" %}
+</div>
+{% endblock %}
+{% block script %}
+<script>
+$(document).ready(function(){
+    $('input[type=radio]').change(function(e){
+        console.log(e.target.value)
+        e.preventDefault()
+        var radioValue = $("input[name='child']:checked").val()                
+        $.ajax({
+            type:'POST',
+            url: "/",
+            data:{
+                'event':e.target.value,
+                csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+            },
+            success: function(result){
+                console.log(result.parent_prod)
+                var data = JSON.parse(result.prod_data)
+                var price = data[0].fields.price
+                var replace_price = document.getElementById('price_'+result.parent_prod) 
+                replace_price.innerHTML = "RS. "+price
+                console.log("success")
+            },
+            error: function(error){
+                console.log("error",error)
+            },
+        });   
+    });  
+})
+</script>
+{% endblock %}

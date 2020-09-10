@@ -1,0 +1,70 @@
+{% for product in object_list  %}
+{% if product.is_parent %}
+    <div class="card col-md-4">
+        
+        <a class = "btn btn-danger"href="{% url 'product_details' product.id %}" style="width: 100%;">
+        <img class="card-img-top" src="{{product.image.url}}" height="250px" alt="Card image cap">
+        </a> 
+         
+        <div class="card-body">
+            <h5 class="card-title" id="name">{{product.name}}</h5>
+            <p class="card-text " id ="desc">{{product.description}}</p>
+            <p class="card-text" id="price_{{product.id}}">Price: Rs{{product.price}}</p>
+            <p class="card-text">Avalable :{{product.status}}</p> 
+            <form method="POST" class="form"> 
+                {% csrf_token %}
+                {% for pro_attr in product.product_type.product_attribute.all%}
+                {{pro_attr.name}}
+                {% endfor %}<br>
+                <div>
+                    <ul>
+                    {% for child in product.parent.all %}
+                        {% if product.parent.all.first == child %}
+                        <li style="list-style: none;">
+                            <label for={{child.id}}>{{child.name}}</label>
+                            <input type="radio" id={{child.id}} name="child" class="chil" value="{{child.id}}" checked>
+                        </li>
+                        {% else %}
+                        <li style="list-style: none;">
+                            <label for={{child.id}}>{{child.name}}</label>
+                            <input type="radio" id={{child.id}} name="child" class="chil" value="{{child.id}}">
+                        </li>
+                        {% endif %}   
+                    {% endfor %}
+                    </ul>
+                </div>
+                <p>Quantity: <input type="number" class="nu" name ="{{product.name|cut:' '}}" value=1></p>
+                <button type="submit" class="btn btn-info">Add to Cart</button>
+            </form> 
+        </div>
+    </div>
+{% endif %}
+{% endfor %}
+<script>
+$(document).ready(function(){
+    $('input[type=radio]').change(function(e){
+        console.log(e.target.value)
+        e.preventDefault()
+        var radioValue = $("input[name='child']:checked").val()                
+        $.ajax({
+            type:'POST',
+            url: "/",
+            data:{
+                'event':e.target.value,
+                csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+            },
+            success: function(result){
+                console.log(result.parent_prod)
+                var data = JSON.parse(result.prod_data)
+                var price = data[0].fields.price
+                var replace_price = document.getElementById('price_'+result.parent_prod) 
+                replace_price.innerHTML = "Price: Rs" + price
+                console.log("success")
+            },
+            error: function(error){
+                console.log("error",error)
+            },
+        });   
+    });  
+})
+</script>

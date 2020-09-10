@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load mptt_tags %}
+{% block main %}
+  
+	<!-- Page Preloder -->
+<div id="preloder">
+  <div class="loader"></div>
+</div>
+<div class="site-wrap">  
+    {% include "navbar.html" %}
+	<div class="page-top-info">
+		<div class="container">
+			<h4>Category Page</h4>
+		</div>
+	</div>
+	<section class="category-section spad">
+		<div class="container">  
+			<div class="row">
+				<div class="col-lg-3 order-2 order-lg-1">
+					<div class="filter-widget">
+						<h2 class="fw-title">Categories</h2>
+						<ul class="category-menu">
+                        {% recursetree cates %}
+                            <li>
+                                <a href="{% url 'testing' node.id %}">{{ node.name }}</a> 
+                                {% if not node.is_leaf_node %}
+                                    <ul class="sub-menu" style="padding-left: 20px;">
+                                      <ul class="category-menu">{{ children }}</ul>
+                                      
+                                    </ul>
+                                {% endif %}
+                            </li>
+                        {% endrecursetree %}
+						</ul>
+                    </div>
+                    <div class="filter-widget">
+                         {% for m in pro_attr %}
+                        <h2 class="fw-title" style="margin-top: 20px;">{{m.name}}</h2>
+                        
+                  
+                        <ul class="category-menu">
+                            {% for n in m.product_attribute_value.all|dictsort:'name' %}
+                            {% ifchanged %}
+                            <li><a href="/categorys/{{cat_obj.id}}/{{n.name}}/" class="filter" name={{n.name}}>{{n.name}}</a></li>
+                            {% endifchanged %}
+                             {% endfor %}
+						</ul>
+                        {% endfor %}
+                    </div>
+                     <!-- <div class="filter-widget">
+                         {% for m in pro_attr %}
+                        <h2 class="fw-title" style="margin-top: 20px;">{{m.name}}</h2>
+                        <ul class="category-menu">
+                            {% for n in m.product_attribute_value.all|dictsort:'name' %}
+                            {% ifchanged %}
+                            
+                            <li><a href="/categorys/{{cat_obj.id}}/{{n.name}}/" class="filter" name={{n.name}}>{{n.name}}</a></li>
+                            {% endifchanged %}
+                             {% endfor %}
+						</ul>
+                        {% endfor %}
+                    </div> -->
+                   
+                </div>
+                
+
+				<div class="col-lg-9  order-1 order-lg-2 mb-5 mb-lg-0">
+					<div class="row">
+            {% for product in prod %}
+            
+             
+              <div class="col-lg-4 col-md-6 item-entry mb-5">
+                    <a href="{% url 'product_details' product.id %}">
+                      <img src="{{product.image.url}}" style="height: 40%; width: 100%;" alt="Image"  class="img-fluid">
+                    </a>
+                      <h1 class="item-title" style="font-size: 20px; padding-top: 20px; padding-bottom: 10px;">{{product.name}}</h1>
+                      <p><strong class="item-price" id=price_{{product.id}}><i class='fa fa-inr' aria-hidden='true'></i>{{product.price}}</strong></p>
+                      <form method="POST" class="form"> 
+                          {% csrf_token %}
+                          
+                          <div class="input-group mb-3" style="max-width: 120px;">
+                                  <div class="input-group-prepend">
+                                  <button class="btn btn-outline-primary js-btn-minus" type="button">&minus;</button>
+                                  </div>
+                                  <input type="text" name="hidden" value="{{product.id}}" hidden>
+                                  <input type="text" class="form-control text-center" style="height:43px" name ="filter_pro" value=1 aria-label="Example text with button addon" aria-describedby="button-addon1">
+                                  <div class="input-group-append">
+                                  <button class="btn btn-outline-primary js-btn-plus" type="button">&plus;</button>
+                                  </div>
+                              </div>
+                          <button type="submit" class="btn btn-info">Add to Cart</button>
+                      </form> 
+              </div>
+            
+          
+              {% endfor %}	
+              
+              
+					</div>
+				</div>
+			</div>
+		</div>
+    </section>
+  
+    {% include "footer.html" %}
+    </div>
+{% endblock %}
+ {% block script %}
+
+<script>
+    $(document).ready( function () {	
+	var s = []
+	$(".checkallusers").change(function(e){
+     e.preventDefault()
+     var checked = $(this).is(':checked');
+      if(checked){
+          s.push(e.target.value)
+      }
+      else{
+          s.pop(e.target.value)
+      }
+     console.log(s)
+    });
+});
+</script>
+{% endblock %}
