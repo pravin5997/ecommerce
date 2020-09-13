@@ -82,9 +82,6 @@
             <div class="row">
               <div class="col-md-12">
                 <label class="text-black h4" for="coupon">Coupon</label>
-                <!-- <div id = "success">
-                  <p class="alert alert-success" hidden><p>
-                </div> -->
                 {% if messages %}
                 {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}" id="message_container" role="alert">
@@ -125,24 +122,6 @@
                     <strong class="text-black" id="sub_total"><i class="fa fa-inr" aria-hidden="true"></i>{{cart_object.total}}</strong>
                   </div>
                 </div>
-                <!-- <div class="row mb-5">
-                  <div class="col-md-6">
-                    <span class="text-black">Discount</span>
-                  </div>
-                  <div class="col-md-6 text-right">
-                    <strong class="text-black" id ="discount"><i class="fa fa-inr" aria-hidden="true"></i>{{cart_object.total_discount}}</strong>
-                  </div>
-                </div> -->
-                <!-- <div id = "show_coupon">
-                <div class="row mb-5" hidden>
-                  <div class="col-md-12">
-                    <div class="alert alert-success">
-                      <button class="btn btn-danger" style="float: right; height: 20px; font-size:12px; padding-top: 2px;">X</button>
-                      <p></p>   
-                    </div> 
-                  </div>
-                </div>
-                </div> -->
                 {% if cart_object.coupon %}
                  <div class="row mb-5" id = "coopon_disc">
                   <div class="col-md-12">
@@ -207,7 +186,7 @@ $(document).ready(function(){
         e.preventDefault()
        $.ajax({
             type:'GET',
-            url: '{% url "crud_ajax_delete" %}',
+            url: '{% url "cartlists" %}',
             data:{"id":e.target.id},
             dataType: 'json',
             success: function (data) {
@@ -244,78 +223,11 @@ $(document).ready(function(){
                 
                 $('#my_discount').html("-<i class='fa fa-inr' aria-hidden='true'></i>"+data.cart_discount)
                 $('#sub_total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.cart_sub_total)
-                $('#total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.cart_total) 
-                $('#show_coupon').html('<div class="row mb-5" '+data.my_tag+'></div>')
-                $('#success').html('<p class="alert alert-" +'+data.my_tag+'><p>')
-                document.getElementById("coupon").value = "";
-                $('#discount').html("<i class='fa fa-inr' aria-hidden='true'></i>"+0)
+                $('#total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.cart_total)
               }
         }
         });    
-    });  
-
-    // $('#my_coupon').click(function(e){
-    //   e.preventDefault()
-    //   var a = document.getElementById("coupon").value;
-    //   $.ajax({
-    //       type:'POST',
-    //       url: '{% url "cartlists" %}',
-    //       data:{"coupon":a,
-    //             csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
-    //             },
-    //       success: function (data) {
-    //         $('#sub_total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.sub_total)
-    //         $('#total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.total_price) 
-    //         $('#discount').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.total_discount)
-    //         $('#success').html('<p class="alert alert-'+data.message_tag+'">'+data.message+'<p>')
-    //         $('#show_coupon').html('<div class="row mb-5" '+data.div_tag+'><div class="col-md-12"><div class="alert alert-success"><button class="btn btn-danger"  id = "remove" style="float: right; height: 20px; font-size:12px; padding-top: 2px;">X</button><p>coupon '+data.code+' is apply<br>'+data.code_dec+'</p></div></div></div>')
-    //       console.log("success")
-    //       }
-    //     });    
-    // });
-
-    $('#show_coupon').click(function(e){
-        e.preventDefault()
-          $.ajax({
-          type:'POST',
-          url: '{% url "cartlists" %}',
-          data:{"code_remove": "remove",
-                csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
-                },
-          success: function (data) {
-          $('#sub_total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.total_price)
-          $('#total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.total_price) 
-          $('#discount').html("<i class='fa fa-inr' aria-hidden='true'></i>"+0)
-          $('#success').html('<p class="alert alert-" hidden><p>')
-          document.getElementById("coupon").value = "";
-          $('#show_coupon').html('<div class="row mb-5" hidden>')
-          console.log("success")
-          }
-        });
-     }); 
-
-     $('#order').click(function(e){
-        var c= document.getElementById("coupon").value;
-        
-         $.ajax({
-          type:'POST',
-          url: '{% url "cartlists" %}',
-          data:{"order": c,
-                csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
-                },
-          success: function (data) {
-          console.log("success")
-          }
-        });
-         
-     });
-
-       $('.dec').click( function (e) {
-        e.preventDefault()
-        console.log(e.target)
-        var a = document.getElementsByClassName("quanti")
-        console.log(a[0].value)
-        });        
+    });         
 })
 </script>
 <script>

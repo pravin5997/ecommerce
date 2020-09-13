@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ProductView, ProductDetailView, CartItemList, DeleteCrudUser, ProductFilter, ProductCategory, ShippingAddress, BillingAddress, PaymentMethod, RemoveCode
+from .views import ProductView, ProductDetailView, CartItemList, ProductFilter, ProductCategory, ShippingAddress, BillingAddress, PaymentMethod, RemoveCode
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -8,7 +8,6 @@ urlpatterns = [
     path("category/<int:pk>/prod/", ProductFilter.as_view(), name="product_filter"),
     path("<int:pk>/", ProductDetailView.as_view(), name="product_details"),
     path("cartlist/", CartItemList.as_view(), name="cartlists"),
-    path('delete/', DeleteCrudUser.as_view(), name='crud_ajax_delete'),
     path("categorys/<int:pk>/", ProductCategory.as_view(), name="testing"),
     # path("address/", Checkout.as_view(), name="address"),
     # path("checkout/", AddressCreate.as_view(), name="checkout"),

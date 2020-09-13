@@ -13,7 +13,7 @@
                 <li class="has-children active">
                   <a href="#">Category</a>
                     <ul class="dropdown">
-                        {% recursetree cates %}
+                        {% recursetree categorys %}
                             <li class="has-children" id ={{node.id}} style="padding: 5px;">
                                 <a href="{% url 'testing' node.id %}">{{ node.name }}</a> 
                                 {% if not node.is_leaf_node %}
@@ -38,7 +38,7 @@
             <a href="#" class="icons-btn d-inline-block"><span class="icon-heart-o"></span></a>
             <a href="{% url 'cartlists' %}" class="icons-btn d-inline-block bag">
               <span class="icon-shopping-bag"></span>
-              <span class="number" id = "count">{{cart_count.count}}</span>
+              <span class="number" id = "count">{{cart_item_count.count}}</span>
             </a>
             <a href="#" class="site-menu-toggle js-menu-toggle ml-3 d-inline-block d-lg-none"><span class="icon-menu"></span></a>
           </div>

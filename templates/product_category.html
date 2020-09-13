@@ -20,7 +20,7 @@
 					<div class="filter-widget">
 						<h2 class="fw-title">Categories</h2>
 						<ul class="category-menu">
-                        {% recursetree cates %}
+                        {% recursetree categorys %}
                             <li>
                                 <a href="{% url 'testing' node.id %}">{{ node.name }}</a> 
                                 {% if not node.is_leaf_node %}
@@ -50,6 +50,7 @@
                 </div>
 				<div class="col-lg-9  order-1 order-lg-2 mb-5 mb-lg-0">
 					<div class="row" id = 'countid'>
+                        
                         {% include "product.html" %}
               
 					</div>
@@ -66,7 +67,6 @@
 $(document).ready(function($){
     $('input[type=radio]').change(function(e){
         var cates = $(this).attr('my_cat')
-        console.log(e.target.value)
         e.preventDefault()
         var radioValue = $("input[name='child']:checked").val()                
         $.ajax({
@@ -78,7 +78,7 @@ $(document).ready(function($){
             },
             
             success: function(result){
-                console.log(result.parent_prod)
+                console.log(result.prod_data)
                 var data = JSON.parse(result.prod_data)
                 var price = data[0].fields.price
                 var replace_price = document.getElementById('price_'+result.parent_prod) 
