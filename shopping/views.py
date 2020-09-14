@@ -185,13 +185,11 @@ class CartItemList(View):
                 cart_object.total = cart_price
                 cart_object.save()
             coupon_update(request, cart_object)
-            cart_object.total = cart_object.get_total()
-            cart_object.save()
             data = {
                 'id': cart_item_id,
                 "cart_item": len(cart_item_obj),
                 "cart_sub_total": cart_price,
-                "cart_total":cart_object.total,
+                "cart_total":cart_object.get_total(),
                 "cart_discount":cart_object.total_discount
             }
             return JsonResponse(data)
