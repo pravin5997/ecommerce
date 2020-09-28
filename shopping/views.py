@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404,redirect
-from django.http import HttpResponse,JsonResponse
+from django.http import HttpResponse,JsonResponse, HttpResponseRedirect
 from django.views.generic import View, TemplateView, ListView, DetailView, UpdateView, DeleteView
 from django.views.generic.edit import CreateView
-from .models import Product, Cart, CartItem, ProductAttributeValue,Order, ProductAttribute, ProductType, CouponCode, UserCoupon, Categorys, Address, Payment, PaymentOption
+from .models import Product, Cart, CartItem, ProductAttributeValue, Order, ProductAttribute, ProductType, CouponCode, UserCoupon, Categorys, Address, Payment, PaymentOption, OrderItem
 from .forms import AddressForm
 from decimal import *
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.core import serializers
 from django.template.loader import render_to_string
 from django.contrib import messages
@@ -14,6 +14,10 @@ from django.template import RequestContext
 from django.contrib.auth.models import User
 import json
 import shopping.context_processors as shopping_context
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+import stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY 
     
 
 class ProductFilter(View):
@@ -168,7 +172,7 @@ class CartItemList(View):
 
     def get(self, request):
         cart_object = Cart.objects.get(user=request.user)
-        cart_items = CartItem.objects.filter(cart = cart_object)
+        cart_items = CartItem.objects.filter(cart=cart_object)    
         cart_price = 0 
         for cart_item in cart_items:
             cart_price += cart_item.sub_total
@@ -179,6 +183,9 @@ class CartItemList(View):
         if cart_item_id:
             CartItem.objects.get(id=cart_item_id).delete()
             cart_item_obj = CartItem.objects.filter(cart=cart_object)
+            if len(cart_item_obj) == 0:
+                cart_object.total = 0
+                cart_object.save()
             cart_price = 0
             for cart_item in cart_item_obj:
                 cart_price += cart_item.sub_total
@@ -311,10 +318,73 @@ class RemoveCode(View):
         return redirect("cartlists")
           
 
-class PaymentMethod(View):
-    def get(self, request):
-        pay_option = PaymentOption.objects.all()
-        cart = Cart.objects.get(user=request.user)
-        if cart.billing_address == None:
+class PaymentMethod(TemplateView):
+    template_name = 'payment_option.html'
+
+    def get_context_data(self, **kwargs): # new
+        context = super().get_context_data(**kwargs)
+        context["cart"] = Cart.objects.get(user=self.request.user)
+        if context["cart"].billing_address == None:
             return redirect("shipping_address")
-        return render(request, "payment_option.html", {"cart": cart, "pay_option": pay_option})
+        return context
+        
+        
+@csrf_exempt
+def createpayment(request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    cart = Cart.objects.get(user=request.user)
+    
+    if request.method == "POST":
+        intent = stripe.PaymentIntent.create(
+            amount=int(cart.get_total())*100,
+            currency="inr",
+            )
+        return JsonResponse({'publishableKey': settings.STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})
+
+
+class Paymentcomplete(View):
+    def post(self, request):
+        cart = Cart.objects.get(user=request.user)
+        cart_item = CartItem.objects.filter(cart=cart)
+        order_id = Order(user=request.user, shipping_address = cart.shipping_address, billing_address= cart.billing_address, total_discount= cart.total_discount, total = cart.total, coupon = cart.coupon, sub_total =cart.get_total())
+        order_id.save()
+        for cart_item_id in cart_item:
+            order_item = OrderItem(order=order_id, product=cart_item_id.product, quantity=cart_item_id.quantity, sub_total=cart_item_id.sub_total, price_per_unit=cart_item_id.price_per_unit)
+            order_item.save()
+        user_coupon = UserCoupon.objects.filter(coupon=cart.coupon)
+        if user_coupon:
+            order_coupon = UserCoupon.objects.get(coupon=cart.coupon)
+            order_coupon.is_place_order = True
+            order_coupon.save()
+            cart.coupon = None
+        cart.total = 0
+        cart.total_discount = None
+        cart.save()
+        cart_item.delete() 
+        data = json.loads(request.POST.get("payload"))
+        amount = (data["amount"])/100
+        return render(request, "payment-complete.html", {"amount": amount, "order_id":order_id})
+        
+
+class MyOrder(ListView):
+    model = OrderItem
+    template_name = "my_order.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order_item = OrderItem.objects.all().order_by("-order_date")
+        context['order_item'] = order_item
+        return context
+
+        
+class OrderDetail(DetailView):
+    model = OrderItem
+    template_name = "order_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order_item = OrderItem.objects.get(id=self.kwargs['pk'])
+        order_id = order_item.order
+        context['order_id'] = order_id
+        context['oredr_item_id'] = order_item.id
+        return context

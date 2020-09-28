@@ -17,7 +17,11 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap-grid.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap-reboot.css' %}"> 
-    <link rel="stylesheet" href="{% static 'css/steppers.css' %}">   
+    <link rel="stylesheet" href="{% static 'css/steppers.css' %}">  
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    <link rel="stylesheet" href="{% static 'cart/css/font-awesome.min.css' %}"/>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script> 
 </head>
 <body> 
 <div class="site-wrap">
@@ -37,7 +41,7 @@
   <div class="md-step-bar-left"></div>
   <div class="md-step-bar-right"></div>
 </div>
-<div class="md-step">
+<div class="md-step active">
   <div class="md-step-circle"><span>3</span></div>
   <div class="md-step-title">Payment Method</div>
   <div class="md-step-bar-left"></div>
@@ -60,7 +64,7 @@
               <div class="form-group">       
                   <h5>{{cart.shipping_address.first_name}} {{cart.shipping_address.last_name}}  {{cart.shipping_address.mobile}}</h5>
                   <p>{{cart.shipping_address.street}}, {{cart.shipping_address.city}}, {{cart.shipping_address.state}}, {{cart.shipping_address.zip_code}}</p>
-                  <a class="btn btn-info btn-lg btn-block" href="{% url 'shipping_address' %}" style="width: 25%; font-size: 16px;">Change</a>       
+                  <a class="btn btn-info btn-lg btn-block" href="{% url 'shipping_address' %}" style="width: 15%; background-color: #fb641b; height: 1%; font-size: 16px;">Change</a>       
                 <div >
               </div>
               </div>
@@ -73,7 +77,7 @@
               <div class="form-group">       
                   <h5>{{cart.billing_address.first_name}} {{cart.billing_address.last_name}}  {{cart.billing_address.mobile}}</h5>
                   <p>{{cart.billing_address.street}}, {{cart.billing_address.city}}, {{cart.billing_address.state}}, {{cart.billing_address.zip_code}}</p>
-                  <a class="btn btn-info btn-lg btn-block" href="{% url 'billing_address' %}" style="width: 25%; font-size: 16px;">Change</a>       
+                  <a class="btn btn-info btn-lg btn-block" href="{% url 'billing_address' %}" style="width: 15%; height: 2%; font-size: 16px;background-color: #fb641b;">Change</a>       
                 <div >
               </div>
               </div>
@@ -83,29 +87,22 @@
             <div class="p-3 p-lg-5 border" style="padding-left:0px !important; padding-top: 0px !important; padding-right: 0px !important; box-shadow: 0 10px 10px -5px;">
             <h2 class="h3 mb-3 text-black" style="background-color: #2874f0; color: #fff; padding: 10px; font-size: 18px; font-weight: 500px; text-transform: uppercase;"><strong>Payment Method</strong></h2>
             <div style="padding-left: 10px; padding-top: 10px;">
-            <form>
-              <div class="form-group">
-                  <table>
-                    {% for pay in pay_option %}
-                    {% if pay_option.first == pay %}
-                    <tr>
-                        <td><input type="radio" name="paymnet" id={{pay.id}} value={{pay.option}} checked></td>
-                        <td style="padding-left: 15px;">
-                            <label for={{pay.id}}>{{pay.option}}</label>
-                        </td>
-                      </tr>
-                    {% else %}
-                    <td><input type="radio" name="paymnet" id={{pay.id}} value={{pay.option}}></td>
-                        <td style="padding-left: 15px;">
-                            <label for={{pay.id}}>{{pay.option}}</label>
-                        </td>
-                      </tr>
-                      {% endif %}
-                    {% endfor %}
-                  </table>
-              </div>
-              <button class="btn btn-primary btn-lg btn-block" type="submit" style="width: 25%;">Place Order & Pay</button>
-            </form>
+                 <form id="payment-form">
+                  <div id="card-element"><!--Stripe.js injects the Card Element--></div>
+                  <button id="submit">
+                    <div class="spinner hidden" id="spinner"></div>
+                    <span id="button-text">Pay <i class="fa fa-inr" aria-hidden="true"></i>{{cart.get_total}}</span>
+                  </button>
+                  <p id="card-error" role="alert"></p>
+                  <p class="result-message hidden">
+                    Payment succeeded, see the result in your
+                    <a href="" target="_blank">Stripe dashboard.</a> Refresh the page to pay again.
+                  </p>
+                </form>
+                    <form id="payload" class="hidden" action="/payment-complete" method="post">
+                  {% csrf_token %}
+                  <input id ="data-payload" type="hidden" name="payload"/>
+                </form>
             </div>
             </div>
           </div>
@@ -129,18 +126,18 @@
                         {% endfor %}
                       <tr>
                         <td class="text-black font-weight-bold" style="padding-top:50px ;"><h5><strong>Cart Subtotal</strong></h5></td>
-                        <td class="text-black" style="padding-top:50px ;"><h5><strong>{{cart.total}}</strong></h5></td>
+                        <td class="text-black" style="padding-top:50px ;"><h5><strong><i class="fa fa-inr" aria-hidden="true"></i>{{cart.total}}</strong></h5></td>
                       </tr>
                       {% if cart.coupon %}
                       <tr> 
                         <td class="text-black font-weight-bold" style="color: rgb(132, 224, 123);"><h5><strong>Promo Code</strong><br>
                         <span>{{cart.coupon.code}}</span></h5></td>
-                        <td class="text-black font-weight-bold" style="color: rgb(132, 224, 123);"><h5><strong> - {{cart.total_discount}}</strong></h5></td>
+                        <td class="text-black font-weight-bold" style="color: rgb(132, 224, 123);"><h5><strong> - <i class="fa fa-inr" aria-hidden="true"></i>{{cart.total_discount}}</strong></h5></td>
                       </tr>
                       {% endif %}
                       <tr> 
                         <td class="text-black font-weight-bold"><h5><strong>Order Total</strong></h5></td>
-                        <td class="text-black font-weight-bold"><h5><strong>{{cart.get_total}}</strong></h5></td>
+                        <td class="text-black font-weight-bold"><h5><strong><i class="fa fa-inr" aria-hidden="true"></i>{{cart.get_total}}</strong></h5></td>
                       </tr>
                     </tbody>
                   </table>
@@ -159,7 +156,7 @@
 
       {% include "footer.html" %}
   </div>
-
+    <script src="{% static 'js/client.js' %}"></script>
   	<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
     <script src="{% static 'js/jquery-ui.js' %}"></script>
     <script src="{% static 'js/popper.min.js' %}"></script>

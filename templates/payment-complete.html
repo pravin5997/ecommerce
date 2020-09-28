@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+ {% block style %}
+  <style>
+p {
+    font-size: 14px;
+    margin-bottom: 7px
+}
+
+.small {
+    letter-spacing: 0.5px !important
+}
+
+.card-1 {
+    box-shadow: 2px 2px 10px 0px rgb(190, 108, 170)
+}
+
+hr {
+    background-color: rgba(248, 248, 248, 0.667)
+}
+
+.bold {
+    font-weight: 500
+}
+
+.change-color {
+    color: #AB47BC !important
+}
+
+.card-2 {
+    box-shadow: 1px 1px 3px 0px rgb(112, 115, 139)
+}
+
+.fa-circle.active {
+    font-size: 8px;
+    color: #AB47BC
+}
+
+.fa-circle {
+    font-size: 8px;
+    color: #aaa
+}
+
+.rounded {
+    border-radius: 2.25rem !important
+}
+
+.progress-bar {
+    background-color: #AB47BC !important
+}
+
+.progress {
+    height: 5px !important;
+    margin-bottom: 0
+}
+
+.invoice {
+    position: relative;
+    top: -70px
+}
+
+.Glasses {
+    position: relative;
+    top: -12px !important
+}
+
+.card-footer {
+    background-color: #AB47BC;
+    color: #fff
+}
+
+h2 {
+    color: rgb(78, 0, 92);
+    letter-spacing: 2px !important
+}
+
+.display-3 {
+    font-weight: 500 !important
+}
+
+@media (max-width: 479px) {
+    .invoice {
+        position: relative;
+        top: 7px
+    }
+    .border-line {
+        border-right: 0px solid rgb(226, 206, 226) !important
+    }
+}
+@media (max-width: 700px) {
+    h2 {
+        color: rgb(78, 0, 92);
+        font-size: 17px
+    }
+    .display-3 {
+        font-size: 28px;
+        font-weight: 500 !important
+    }
+}
+.card-footer small {
+    letter-spacing: 7px !important;
+    font-size: 12px
+}
+.border-line {
+    border-right: 1px solid rgb(226, 206, 226)
+}
+    </style>
+  {% endblock %}
+{% block main %}
+<div id="preloder">
+		<div class="loader"></div>
+	</div>
+<div class="site-wrap">
+{% include "navbar.html" %}
+
+<div class="site-section">
+<div class="container" style="margin-bottom: 40px;">
+
+<div class="card card-1">
+    <div class="card-header bg-white">
+        <div class="media flex-sm-row flex-column-reverse justify-content-between ">
+            <div class="col my-auto">
+                <h3 class="mb-2">Thanks for your Order, <span class="change-color">{{request.user.username}}</span> !</h3>
+            </div>  
+        </div>
+    </div>
+<div class="card-body">
+{% for order in order_id.order.all %}
+    <div class="row mt-4">
+        <div class="col">
+            <div class="card card-2">
+                <div class="card-body">
+                    <div class="media">
+                        <div class="sq align-self-center "> <img class="img-fluid my-auto align-self-center mr-2 mr-md-4 pl-0 p-0 m-0" src="{{order.product.image.url}}" width="150" height="150" /></div>
+                        <div class="media-body my-auto text-right">
+                            <div class="row my-auto flex-column flex-md-row">
+                                <div class="col-auto my-auto"> <small>{{order.product.name}} </small></div>
+                                <div class="col my-auto"> <small>Price : {{order.price_per_unit}}</small></div>
+                                <div class="col my-auto"> <small>Qty : {{order.quantity}}</small></div>
+                                <div class="col my-auto">
+                                    <h6 class="mb-0">&#8377;{{order.sub_total}}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+<div class="row mt-4">
+    <div class="col">
+        <div class="row">
+            <div class="col-md-9">
+                <h4 class="mb-1 text-dark"><b>Order Details</b></h4>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-5"><p class="mb-1"><b>Sub Total :</b></p></div>
+                     <div class="col-md-7">&#8377;{{order_id.total}}</div>
+                </div>
+            </div> 
+            <div class="col-md-9">
+                 <p class="mb-1">Order Id : {{order_id.id}}</p>
+            </div>
+             <div class="col-3">
+                 <div class="row">
+                    <div class="col-md-5"><p class="mb-1"><b>Discount :</b></p></div>
+                     {% if order_id.total_discount %}
+                     <div class="col-md-7">&#8377;{{order_id.total_discount}}</div>
+                {% else %}
+                     <div class="col-md-7">&#8377;0.00</div>
+                {% endif %}
+                </div>
+            </div>  
+             <div class="col-md-9">
+                 <p class="mb-1">Order Date : {{order_id.created_date_time|date:'F d, Y'}}</p>
+            </div> 
+            <div class="col-3">
+                <div class="row">
+                    <div class="col-md-5"><p class="mb-1"><b>Total :</b></p></div>
+                     <div class="col-md-7">&#8377;{{order_id.sub_total}}</div>
+                </div>
+                 
+            </div>
+            
+               
+        </div>
+    </div>
+</div>
+
+
+</div>
+<div class="card-footer">
+    <div class="jumbotron-fluid">
+        <div class="row justify-content-between">
+            <div class="col-auto my-auto ">
+                <h2 class="mb-0 font-weight-bold">TOTAL PAID</h2>
+            </div>
+            <div class="col-auto my-auto ml-auto">
+                <h1 class="display-3 ">&#8377; {{order_id.sub_total}}</h1>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+{% include "footer.html" %}
+</div>
+{% endblock %}
+

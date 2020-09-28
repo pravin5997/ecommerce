@@ -17,7 +17,8 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap-grid.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap-reboot.css' %}"> 
-    <link rel="stylesheet" href="{% static 'css/steppers.css' %}">   
+    <link rel="stylesheet" href="{% static 'css/steppers.css' %}"> 
+    <link rel="stylesheet" href="{% static 'cart/css/font-awesome.min.css' %}"/> 
 </head>
 <body> 
 <div class="site-wrap">
@@ -31,7 +32,7 @@
   <div class="md-step-bar-left"></div>
   <div class="md-step-bar-right"></div>
 </div>
-<div class="md-step">
+<div class="md-step active">
   <div class="md-step-circle"><span>2</span></div>
   <div class="md-step-title">Billing Address</div>
   <div class="md-step-bar-left"></div>
@@ -59,7 +60,7 @@
               <div class="form-group">       
                   <h5>{{cart.shipping_address.first_name}} {{cart.shipping_address.last_name}}  {{cart.shipping_address.mobile}}</h5>
                   <p>{{cart.shipping_address.street}}, {{cart.shipping_address.city}}, {{cart.shipping_address.state}}, {{cart.shipping_address.zip_code}}</p>
-                  <a class="btn btn-info btn-lg btn-block" href="{% url 'shipping_address' %}" style="width: 25%; font-size: 16px;">Change</a>       
+                  <a class="btn btn-info btn-lg btn-block" href="{% url 'shipping_address' %}" style="width: 15%; height: 1%; font-size: 16px;background-color: #fb641b;">Change</a>       
                 <div >
               </div>
               </div>
@@ -98,7 +99,7 @@
                       	{% endfor %}
                   </table>
                   <div >
-               <button class="btn btn-info btn-lg btn-block" type="submit" style="width: 25%; margin-left: 30%; margin-right: 30%;">Deliver Here</button>
+               <button class="btn btn-info btn-lg btn-block" type="submit" style="width: 20%; margin-left: 6%;background-color: #fb641b;height: 1%">Deliver Here</button>
                </div>
               </div>
             </form>
@@ -183,18 +184,18 @@
                         {% endfor %}
                       <tr>
                         <td class="text-black font-weight-bold" style="padding-top:50px ;"><h5><strong>Cart Subtotal</strong></h5></td>
-                        <td class="text-black" style="padding-top:50px ;"><h5><strong>{{cart.total}}</strong></h5></td>
+                        <td class="text-black" style="padding-top:50px ;"><h5><strong><i class="fa fa-inr" aria-hidden="true"></i>{{cart.total}}</strong></h5></td>
                       </tr>
                       {% if cart.coupon %}
                       <tr> 
                         <td class="text-black font-weight-bold" style="color: rgb(132, 224, 123);"><h5><strong>Promo Code</strong><br>
                         <span>{{cart.coupon.code}}</span></h5></td>
-                        <td class="text-black font-weight-bold" style="color: rgb(132, 224, 123);"><h5><strong> - {{cart.total_discount}}</strong></h5></td>
+                        <td class="text-black font-weight-bold" style="color: rgb(132, 224, 123);"><h5><strong> - <i class="fa fa-inr" aria-hidden="true"></i>{{cart.total_discount}}</strong></h5></td>
                       </tr>
                       {% endif %}
                       <tr> 
                         <td class="text-black font-weight-bold"><h5><strong>Order Total</strong></h5></td>
-                        <td class="text-black font-weight-bold"><h5><strong>{{cart.get_total}}</strong></h5></td>
+                        <td class="text-black font-weight-bold"><h5><strong><i class="fa fa-inr" aria-hidden="true"></i>{{cart.get_total}}</strong></h5></td>
                       </tr>
                     </tbody>
                   </table>

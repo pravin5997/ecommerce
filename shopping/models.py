@@ -65,12 +65,11 @@ class CartItem(models.Model):
     sub_total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.id}"
-        
+        return f"{self.id}"    
 
 
 class Cart(models.Model):
-    user = models.ForeignKey(User, related_name="user_cart", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="user_cart", on_delete=models.CASCADE, null=True)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     status = models.BooleanField(default=True)
     shipping_address = models.ForeignKey('Address', related_name='cart_shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
@@ -79,7 +78,7 @@ class Cart(models.Model):
     total_discount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
-        return self.user.username
+        return str(self.id)
 
     def get_total(self):
         total = 0
@@ -87,27 +86,33 @@ class Cart(models.Model):
             total += item.sub_total
         if self.coupon and self.total_discount:
             total -= self.total_discount
-        return total
-     
+        return total 
 
 
 class Order(models.Model):
     user = models.ForeignKey(User, related_name="user_order", on_delete=models.CASCADE)
     created_date_time = models.DateTimeField(auto_now_add=True)
-    shipping_address = models.ForeignKey('Address', related_name='shipping_address', on_delete=models.CASCADE, blank=True, null=True)
-    billing_address = models.ForeignKey('Address', related_name='billing_address', on_delete=models.CASCADE, blank=True, null=True)
+    shipping_address = models.ForeignKey('Address', related_name='order_shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
+    billing_address = models.ForeignKey('Address', related_name='order_billing_address', on_delete=models.SET_NULL, blank=True, null=True)
     coupon = models.ForeignKey('CouponCode', related_name="order_coupon", on_delete=models.CASCADE, blank=True, null=True)
     total_discount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    sub_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
-
     def __str__(self):
         return "{}".format(self.user)
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, related_name="ordered", on_delete=models.CASCADE)
-    cart_item = models.ForeignKey(CartItem, related_name="cart_items", on_delete=models.CASCADE, default=1)
-    total = models.IntegerField()
-    
+    order = models.ForeignKey(Order, related_name="order", on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name="order_product", on_delete=models.CASCADE, null=True, blank=True)
+    quantity = models.IntegerField(default=0)
+    price_per_unit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    sub_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    order_date = models.DateTimeField(auto_now_add=True)
+    status = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "{}".format(self.order.id)
 
 
 class Address(models.Model):

@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+ {% block style %}
+  <style>
+p {
+    font-size: 14px;
+    margin-bottom: 7px
+}
+
+.small {
+    letter-spacing: 0.5px !important
+}
+
+.card-1 {
+    box-shadow: 2px 2px 10px 0px rgb(190, 108, 170)
+}
+
+hr {
+    background-color: rgba(248, 248, 248, 0.667)
+}
+
+.bold {
+    font-weight: 500
+}
+
+.change-color {
+    color: #AB47BC !important
+}
+
+.card-2 {
+    box-shadow: 1px 1px 3px 0px rgb(112, 115, 139)
+}
+
+.fa-circle.active {
+    font-size: 8px;
+    color: #AB47BC
+}
+
+.fa-circle {
+    font-size: 8px;
+    color: #aaa
+}
+
+.rounded {
+    border-radius: 2.25rem !important
+}
+
+.progress-bar {
+    background-color: #AB47BC !important
+}
+
+.progress {
+    height: 5px !important;
+    margin-bottom: 0
+}
+
+.invoice {
+    position: relative;
+    top: -70px
+}
+
+.Glasses {
+    position: relative;
+    top: -12px !important
+}
+
+.card-footer {
+    background-color: #AB47BC;
+    color: #fff
+}
+
+h2 {
+    color: rgb(78, 0, 92);
+    letter-spacing: 2px !important
+}
+
+.display-3 {
+    font-weight: 500 !important
+}
+
+@media (max-width: 479px) {
+    .invoice {
+        position: relative;
+        top: 7px
+    }
+
+    .border-line {
+        border-right: 0px solid rgb(226, 206, 226) !important
+    }
+}
+
+@media (max-width: 700px) {
+    h2 {
+        color: rgb(78, 0, 92);
+        font-size: 17px
+    }
+
+    .display-3 {
+        font-size: 28px;
+        font-weight: 500 !important
+    }
+}
+
+.card-footer small {
+    letter-spacing: 7px !important;
+    font-size: 12px
+}
+
+.border-line {
+    border-right: 1px solid rgb(226, 206, 226)
+}
+    </style>
+  {% endblock %}
+{% block main %}
+<div id="preloder">
+		<div class="loader"></div>
+	</div>
+<div class="site-wrap">
+{% include "navbar.html" %}
+<div class="page-top-info">
+		<div class="container">
+			<h4>Your Order</h4>
+			<div class="site-pagination" style="padding-top: 20px;">
+				<a href="{% url 'product' %}">Home</a> /
+				<a href="">My Order</a>
+			</div>
+		</div>
+  </div>
+<div class="site-section">
+<div class="container" style="margin-bottom: 40px;">
+    <div class="card card-1">
+        <div class="card-body">
+            {% for order in order_item %}
+            <div class="row mt-4">
+                
+                <div class="col">
+                    <div class="card card-2">
+                        <div class="card-body">
+                            <a href="{% url 'order_details' order.id %}">
+                            <div class="media">
+                                <div class="sq align-self-center "> <img class="img-fluid my-auto align-self-center mr-2 mr-md-4 pl-0 p-0 m-0" src="{{order.product.image.url}}" width="150" height="150" /></div>
+                                <div class="media-body my-auto text-right">
+                                    <div class="row my-auto flex-column flex-md-row">
+                                       
+                                        <div class="col-auto my-auto"> <small>{{order.product.name}} </small></div>
+                                        <div class="col my-auto"> <small>Price : {{order.price_per_unit}}</small></div>
+                                        <div class="col my-auto"> <small>Qty : {{order.quantity}}</small></div>
+                                        <div class="col my-auto"> <small>&#8377;{{order.sub_total}}</small></div>
+                                        <div class="col my-auto">
+                                            {% if order.status == False %}
+                                            <h6 class="mb-0" style="color: #26a541;">Processing...</h6>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> 
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+           
+        </div>
+    </div>
+</div>
+{% include "footer.html" %}
+</div>
+{% endblock %}
+

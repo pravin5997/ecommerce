@@ -38,7 +38,7 @@ class CouponAdmin(admin.ModelAdmin):
     list_display = ("code", "valid_from", "valid_To", "discount", "active")
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ("user", "created_date_time", "shipping_address", "billing_address", "coupon", "total_discount")
+    list_display = ("user", "created_date_time",)
 
 # Register your models here.
 admin.site.register(Address, AddressAdmin)
