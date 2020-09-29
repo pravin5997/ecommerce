@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ProductView, ProductDetailView, CartItemList, ProductFilter, ProductCategory, ShippingAddress, BillingAddress, PaymentMethod, RemoveCode, createpayment, Paymentcomplete, MyOrder, OrderDetail
+from .views import ProductView, ProductDetailView, CartItemList, ProductFilter, ProductCategory, ShippingAddress, BillingAddress, PaymentMethod, RemoveCode, createpayment, Paymentcomplete, OrderList, OrderDetail
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -16,10 +16,10 @@ urlpatterns = [
     path("payment/", PaymentMethod.as_view(), name="payment"),
     path("cartlist/<int:pk>", RemoveCode.as_view(), name="remove_code"),
     # path("payment-page/", HomePageView.as_view(), name="payment_page"),
-    path("order/", MyOrder.as_view(), name="order"),
+    path("orders/", OrderList.as_view(), name="order"),
     path("create-payment-intent", createpayment, name="create-payment-intent"),
     path("payment-complete", Paymentcomplete.as_view(), name="payment-complete"),
-    path("order/<int:pk>/", OrderDetail.as_view(), name="order_details"),
+    path("orders/<int:pk>/", OrderDetail.as_view(), name="order_details"),
 
     
 ]+static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

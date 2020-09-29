@@ -55,7 +55,7 @@
                         </div>
                       </div>	
                     </td>
-                    <td><button type="submit" class="btn btn-info" style="margin-left: 40px; height: 35px;">Update</button></td>
+                    <td><button type="submit" class="btn btn-primary btn-sm px-4" style="margin-left: 40px; height: 35px;">Update</button></td>
                   </form> 
                   <td class="total-col"><h4><i class="fa fa-inr" aria-hidden="true"></i>{{cart.sub_total}}</h4></td>
                   <td style="padding-left: 25px;"><a href="" id = {{cart.id}}  class="btn btn-primary height-auto btn-sm del" style="background-color: transparent; color: #414141; border: none; font-size: 18px;">X</a></td>
@@ -153,7 +153,7 @@
                 
                 <div class="row">
                   <div class="col-md-12">
-                    <button class="btn btn-primary btn-lg btn-block" ><a href="{% url 'shipping_address' %}" id= "order" style="color: #fff;">Proceed To Checkout</a></button>
+                  <a class="btn btn-primary btn-sm px-4" href="{% url 'shipping_address' %}" id= "order" style="height: 38px; padding-top: 8px;">Proceed To Checkout</a>
                   </div>
                 </div>
               </div>

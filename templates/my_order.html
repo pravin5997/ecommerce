@@ -121,7 +121,7 @@ h2 {
 			<h4>Your Order</h4>
 			<div class="site-pagination" style="padding-top: 20px;">
 				<a href="{% url 'product' %}">Home</a> /
-				<a href="">My Order</a>
+				<a href="">Orders</a>
 			</div>
 		</div>
   </div>
@@ -135,17 +135,14 @@ h2 {
                 <div class="col">
                     <div class="card card-2">
                         <div class="card-body">
-                            <a href="{% url 'order_details' order.id %}">
+                            <a href="{% url 'order_details' order.order.id %}">
                             <div class="media">
                                 <div class="sq align-self-center "> <img class="img-fluid my-auto align-self-center mr-2 mr-md-4 pl-0 p-0 m-0" src="{{order.product.image.url}}" width="150" height="150" /></div>
                                 <div class="media-body my-auto text-right">
                                     <div class="row my-auto flex-column flex-md-row">
-                                       
-                                        <div class="col-auto my-auto"> <small>{{order.product.name}} </small></div>
-                                        <div class="col my-auto"> <small>Price : {{order.price_per_unit}}</small></div>
-                                        <div class="col my-auto"> <small>Qty : {{order.quantity}}</small></div>
-                                        <div class="col my-auto"> <small>&#8377;{{order.sub_total}}</small></div>
-                                        <div class="col my-auto">
+                                        <div class="col-md-4"> <small>{{order.product.name}} </small></div>
+                                        <div class="col-md-4"> <small>&#8377;{{order.price_per_unit}}</small></div>
+                                        <div class="col-md-4">
                                             {% if order.status == False %}
                                             <h6 class="mb-0" style="color: #26a541;">Processing...</h6>
                                             {% endif %}

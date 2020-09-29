@@ -246,6 +246,7 @@ class ShippingAddress(View):
         address_object = Address.objects.filter(user=self.request.user)
         ship_addr_obj = address_object.filter(address_type="S")
         cart = Cart.objects.get(user=request.user)
+        cart_item = cart.cart_item.all()
         form = AddressForm()
         full_ship_ads = request.GET.get("shipping_address")
         if full_ship_ads:    
@@ -253,7 +254,7 @@ class ShippingAddress(View):
             cart.save()
             messages.success(request, "Your Shipping Address Successfully Added")
             return redirect("billing_address")
-        return render(request, "shipping_address.html", {'form': form, "cart": cart, "ship_addr_obj": ship_addr_obj})
+        return render(request, "shipping_address.html", {'form': form, "cart": cart, "ship_addr_obj": ship_addr_obj, "cart_item":cart_item})
 
     def post(self, request):
         form = AddressForm(self.request.POST or None)
@@ -270,8 +271,9 @@ class ShippingAddress(View):
         address_object = Address.objects.filter(user=self.request.user)
         ship_addr_obj = address_object.filter(address_type="S")
         cart = Cart.objects.get(user=request.user)
+        cart_item = cart.cart_item.all()
         messages.success(request, "Your New Shipping address create successfully")
-        return render(request, "shipping_address.html", {'form': form, "cart": cart, "ship_addr_obj": ship_addr_obj})    
+        return render(request, "shipping_address.html", {'form': form, "cart": cart, "ship_addr_obj": ship_addr_obj, "cart_item":cart_item})    
 
         
 class BillingAddress(View):
@@ -280,6 +282,7 @@ class BillingAddress(View):
         billing_addr_obj = address_object.filter(address_type="B")
         form = AddressForm()
         cart = Cart.objects.get(user=request.user)
+        cart_item = cart.cart_item.all()
         if cart.shipping_address == None:
             return redirect("shipping_address")
         full_bill_ads = request.GET.get("billing_address")
@@ -288,7 +291,7 @@ class BillingAddress(View):
             cart.save()
             messages.success(request, "Your Billing Address Successfully Added")
             return redirect("payment")
-        return render(request, "billing_address.html", {'form': form, "cart": cart, "billing_addr_obj": billing_addr_obj})
+        return render(request, "billing_address.html", {'form': form, "cart": cart, "billing_addr_obj": billing_addr_obj, "cart_item":cart_item})
 
     def post(self, request):
         form = AddressForm(self.request.POST or None)
@@ -305,8 +308,9 @@ class BillingAddress(View):
         address_object = Address.objects.filter(user=self.request.user)
         billing_addr_obj = address_object.filter(address_type="B")
         cart = Cart.objects.get(user=request.user)
+        cart_item = cart.cart_item.all()
         messages.success(request, "Your New Billing address create successfully")
-        return render(request, "billing_address.html", {'form': form, "cart": cart, "billing_addr_obj": billing_addr_obj})
+        return render(request, "billing_address.html", {'form': form, "cart": cart, "billing_addr_obj": billing_addr_obj, "cart_item":cart_item})
 
 
 class RemoveCode(View):
@@ -324,6 +328,7 @@ class PaymentMethod(TemplateView):
     def get_context_data(self, **kwargs): # new
         context = super().get_context_data(**kwargs)
         context["cart"] = Cart.objects.get(user=self.request.user)
+        context["cart_item"] =  context["cart"].cart_item.all()
         if context["cart"].billing_address == None:
             return redirect("shipping_address")
         return context
@@ -343,6 +348,7 @@ def createpayment(request):
 
 
 class Paymentcomplete(View):
+
     def post(self, request):
         cart = Cart.objects.get(user=request.user)
         cart_item = CartItem.objects.filter(cart=cart)
@@ -366,25 +372,22 @@ class Paymentcomplete(View):
         return render(request, "payment-complete.html", {"amount": amount, "order_id":order_id})
         
 
-class MyOrder(ListView):
+class OrderList(ListView):
     model = OrderItem
     template_name = "my_order.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        order_item = OrderItem.objects.all().order_by("-order_date")
-        context['order_item'] = order_item
+        order = list(Order.objects.filter(user = self.request.user).values_list("id", flat=True))
+        context['order_item'] = OrderItem.objects.filter(order__in=order).order_by("-order_date")
         return context
 
         
 class OrderDetail(DetailView):
-    model = OrderItem
+    model = Order
     template_name = "order_detail.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        order_item = OrderItem.objects.get(id=self.kwargs['pk'])
-        order_id = order_item.order
-        context['order_id'] = order_id
-        context['oredr_item_id'] = order_item.id
+        context['order_detail'] = Order.objects.get(id=self.kwargs['pk'])
         return context

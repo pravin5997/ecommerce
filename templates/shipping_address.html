@@ -23,7 +23,7 @@
 <body> 
 <div class="site-wrap">
   {% include "navbar.html" %}
-<div class="site-section" style="padding: 0px;">
+<div class="site-section" style="padding-top: 0;">
   <div class="container">
   <div class="md-stepper-horizontal orange" style="margin-bottom: 20px;">
 <div class="md-step active">
@@ -40,7 +40,7 @@
 </div>
 <div class="md-step">
   <div class="md-step-circle"><span>3</span></div>
-  <div class="md-step-title">Payment Method</div>
+  <div class="md-step-title">Payment</div>
   <div class="md-step-bar-left"></div>
   <div class="md-step-bar-right"></div>
 </div>
@@ -55,7 +55,7 @@
 <div class="row">
   <div class="col-md-8 mb-5 mb-md-0">
     <div class="p-3 p-lg-5 border" style="padding: 0px !important; box-shadow: 0 10px 10px -5px; height: 560px; overflow: auto;">
-      <h2 class="h3 mb-3 text-black" style="background-color: #2874f0; color: #fff; padding: 10px; font-size: 18px; font-weight: 500px; text-transform: uppercase;"><strong>Shipping Address</strong></h2>
+      <h2 class="h3 mb-3 text-black" style="background-color: #2874f0; color: #fff; padding: 10px; font-size: 18px; font-weight: 500px; "><strong>Shipping Address</strong></h2>
     <div style="padding-left: 30px; padding-top: 20px;">
     <form> 
       <div class="form-group">
@@ -141,7 +141,7 @@
               </div>
             </div>
 
-            <button class="btn btn-success btn-lg btn-block" style="width: 35%; margin-left: 65%; margin-top: 10px;" type="submit">Add Shipping Address</button>
+            <button class="btn btn-success btn-lg btn-block" style="width: 35%; margin-left: 65%; margin-top: 10px; background-color: #fb641b; color: #000; height: 1%;" type="submit">Add Shipping Address</button>
           </div>
 
         </div>
@@ -156,38 +156,34 @@
       <div class="col-md-12">
         
         <div class="p-3 p-lg-5 border" style="padding-left:0px !important; padding-top: 0px !important; padding-right: 0px !important; background-color: #f1f3f6; box-shadow: 0 10px 10px -5px;">
-          <h2 class="h3 mb-3 text-black" style="background-color: #2874f0; color: #fff; padding: 10px; font-size: 18px; font-weight: 500px; text-transform: uppercase;">Your Order</h2>
+          <h2 class="h3 mb-3 text-black" style="background-color: #2874f0; color: #fff; padding: 10px; font-size: 18px; font-weight: 500px; "><strong>Your Order</strong></h2>
           <table class="table site-block-order-table mb-5" style="border: 0px !important;">
-            <thead>
-              <th>Product</th>
-              <th>Total</th>
-            </thead>
+            
             <tbody>
-                  {% for product in cart_count %}
+                  {% for product in cart_item %}
               <tr>
-                <td>{{product.product.name}}<strong class="mx-1">x</strong>{{product.quantity}}</td>
-                <td>{{product.sub_total}}</td>
+                <td class="text-black"><h5>{{product.product.name}}<strong class="mx-1">x</strong>{{product.quantity}}</h5></td>
+                <td class="text-black"><h5>&#8377;{{product.sub_total}}</h5></td>
               </tr>
                 {% endfor %}
               <tr>
-                <td class="text-black font-weight-bold" style="padding-top:50px ;"><h5><strong>Cart Subtotal</strong></h5></td>
-                <td class="text-black" style="padding-top:50px ;"><h5><strong><i class="fa fa-inr" aria-hidden="true"></i>{{cart.total}}</strong></h5></td>
+                <td class="text-black" style="padding-top:50px ;"><h5>Cart Subtotal</strong></h5></td>
+                <td class="text-black" style="padding-top:50px ;"><h5>&#8377;{{cart.total}}</h5></td>
               </tr>
               {% if cart.coupon %}
               <tr> 
-                <td class="text-black font-weight-bold" style="color: rgb(132, 224, 123);"><h5><strong>Promo Code</strong><br>
+                <td class="text-black" style="color: rgb(132, 224, 123);"><h5>Promo Code<br>
                 <span>{{cart.coupon.code}}</span></h5></td>
-                <td class="text-black font-weight-bold" style="color: rgb(132, 224, 123);"><h5><strong> - <i class="fa fa-inr" aria-hidden="true"></i>{{cart.total_discount}}</strong></h5></td>
+                <td class="text-black" style="color: rgb(132, 224, 123);"><h5>&#8377;{{cart.total_discount}}</h5></td>
               </tr>
               {% endif %}
               <tr> 
-                <td class="text-black font-weight-bold"><h5><strong>Order Total</strong></h5></td>
-                <td class="text-black font-weight-bold"><h5><strong><i class="fa fa-inr" aria-hidden="true"></i>{{cart.get_total}}</strong></h5></td>
+                <td class="text-black"><h5>Order Total</h5></td>
+                <td class="text-black"><h5>&#8377;{{cart.get_total}}</h5></td>
               </tr>
             </tbody>
           </table>
-          
-            <a href="{% url 'cartlists' %}" class="btn btn-primary btn-lg btn-block" style="width: 40%; margin-left: 30%; margin-right: 30%; font-size: 16px;" type="submit">Edit Cart</a> 
+            <a href="{% url 'cartlists' %}" class="btn btn-primary btn-lg btn-block" style="width: 40%; margin-left: 30%; margin-right: 30%;height: 1%; background-color: #fb641b; color: #000;" type="submit">Edit Cart</a> 
         </div>
       </div>
     </div>
