@@ -168,36 +168,30 @@
             <div>
             <div class="row mb-5">
               <div class="col-md-12">
-                <div class="p-3 p-lg-5 border" style="padding-left:0px !important; padding-top: 0px !important; padding-right: 0px !important; background-color: #f1f3f6; box-shadow: 0 10px 10px -5px;">
-          <h2 class="h3 mb-3 text-black" style="background-color: #2874f0; color: #fff; padding: 10px; font-size: 18px; font-weight: 500px; "><strong>Your Order</strong></h2>
-          <table class="table site-block-order-table mb-5" style="border: 0px !important;">
-            
-            <tbody>
-                  {% for product in cart_item %}
-              <tr>
-                <td class="text-black"><h5>{{product.product.name}}<strong class="mx-1">x</strong>{{product.quantity}}</h5></td>
-                <td class="text-black"><h5>&#8377;{{product.sub_total}}</h5></td>
-              </tr>
-                {% endfor %}
-              <tr>
-                <td class="text-black" style="padding-top:50px ;"><h5>Cart Subtotal</strong></h5></td>
-                <td class="text-black" style="padding-top:50px ;"><h5>&#8377;{{cart.total}}</h5></td>
-              </tr>
-              {% if cart.coupon %}
-              <tr> 
-                <td class="text-black" style="color: rgb(132, 224, 123);"><h5>Promo Code<br>
-                <span>{{cart.coupon.code}}</span></h5></td>
-                <td class="text-black" style="color: rgb(132, 224, 123);"><h5>&#8377;{{cart.total_discount}}</h5></td>
-              </tr>
-              {% endif %}
-              <tr> 
-                <td class="text-black"><h5>Order Total</h5></td>
-                <td class="text-black"><h5>&#8377;{{cart.get_total}}</h5></td>
-              </tr>
-            </tbody>
-          </table>
-            <a href="{% url 'cartlists' %}" class="btn btn-primary btn-lg btn-block" style="width: 40%; margin-left: 30%; margin-right: 30%;height: 1%; background-color: #fb641b; color: #000;" type="submit">Edit Cart</a> 
-        </div>
+               <div class="p-3 border" style="padding-left:0px !important; padding-top: 0px !important; padding-right: 0px !important; background-color: #f1f3f6; box-shadow: 0 10px 10px -5px;">
+                  <h2 class="h3 mb-3 text-black" style="background-color: #2874f0; color: #fff; padding: 10px; font-size: 18px; font-weight: 500px; "><strong>Your Order</strong></h2>
+                  <table class="table site-block-order-table" style="border: 0px !important;">
+                    
+                    <tbody>
+                      <tr>
+                        <td class="text-black" style="padding-top:50px;"><h6>Subtotal ({{cart.cart_item.all.count}} items)</h6></td>
+                        <td class="text-black" style="padding-top:50px ;"><h6>&#8377;{{cart.get_sub_total}}</h6></td>
+                      </tr>
+                      {% if cart.coupon %}
+                      <tr> 
+                        <td class="text-black" ><h6>Promo Code<br>
+                        <span style="color: rgb(132, 224, 123);">{{cart.coupon.code}}</span></h6></td>
+                        <td class="text-black" style="color: rgb(132, 224, 123);"><h6><br>-&#8377;{{cart.total_discount}}</h6></td>
+                      </tr>
+                      {% endif %}
+                      <tr style="border-bottom: 1px solid #dee2e6;"> 
+                        <td class="text-black"><h5><strong>Total Payable</strong></h5></td>
+                        <td class="text-black"><h5><strong>&#8377;{{cart.get_total}}</strong></h5></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  
+                </div>
               </div>
             </div>
             </div>

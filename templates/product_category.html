@@ -79,10 +79,10 @@ $(document).ready(function($){
             
             success: function(result){
                 console.log(result.prod_data)
-                var data = JSON.parse(result.prod_data)
-                var price = data[0].fields.price
+                // var data = JSON.parse(result.prod_data)
+                // var price = data[0].fields.price
                 var replace_price = document.getElementById('price_'+result.parent_prod) 
-                replace_price.innerHTML = "<i class='fa fa-inr' aria-hidden='true'></i>"+price
+                replace_price.innerHTML = "<i class='fa fa-inr' aria-hidden='true'></i>"+result.prod_data
                 console.log("success")
             },
             error: function(error){

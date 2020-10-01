@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% block main %}
-<div id="preloder">
-	<div class="loader"></div>
-</div>
+
 <div class="site-wrap">
     {% include "navbar.html" %}
     <div class="page-top-info">
@@ -14,7 +12,7 @@
 			</div>
 		</div>
   </div>
-   {% if cart_count.count != 0 %}
+   {% if cart_object.cart_item.all.count != 0 %}
     <section class="cart-section spad" id = "cart_section">
 		<div class="container">
 			<div class="row">
@@ -24,41 +22,45 @@
              
 							<table>
 							<thead>
-								<tr>
-									<th class="product-th" style="font-size: 20px;">Product</th>
-									<th class="quy-th" style="font-size: 20px;">Quantity</th>
-									<th class="size-th" style="font-size: 20px;">Update</th>
-                  <th class="total-th" style="font-size: 20px;">Price</th>
+								<tr class="mb-3">
+									<th class="product-th" style="font-size: 20px; padding-left: 50px;"><strong>Product</strong></th>
+                  <th class="quy-th" style="font-size: 20px; text-align: inherit; padding-left: 15px;"><strong>Quantity</strong></th>
+                  <th class="total-th" style="font-size: 20px;"><strong>Price</strong></th>
                   <th></th>
 								</tr>
 							</thead>
 							<tbody>
-                 {% for cart in cart_count  %}
+                 {% for cart in cart_object.cart_item.all %}
 								<tr id = {{cart.id}}>
 									<td class="product-col">
                     <a href="{% url 'product_details' cart.product.product.id %}">
-                      
+                    
                     <img src="{{cart.product.image.url}}"  style="border-radius: 8px;" alt="....">
                   
                     </a>
+                    
 										<div class="pc-title">
 											<h4>{{cart.product.name}}</h4>
 											<p><i class="fa fa-inr" aria-hidden="true"></i>{{cart.price_per_unit}}</p>
 										</div>
                   </td>
-                  <form method="POST"> 
-                        {% csrf_token %} 
 									  <td class="quy-col">
-                      <div class="quantity">
-                        <div class="pro-qty">
-                          <input type="text" class="quanti" id = "quanti" name="{{cart.product.name}}" value={{cart.quantity}}>
+                       <div class="mb-5">
+                        <div class="input-group" style="max-width: 110px;">
+                        <div class="input-group-prepend">
+                          <button class="btn btn-outline-primary js-btn-minus minus" id= "{{cart.id}}" type="submit">&minus;</button>
                         </div>
-                      </div>	
+                        <input type="text" id = "cart_{{cart.id}}" class="form-control text-center"  style="height:43px" name ="{{cart.product.name}}" value={{cart.quantity}} aria-label="Example text with button addon" aria-describedby="button-addon1">
+                        <div class="input-group-append">
+                          <button class="btn btn-outline-primary js-btn-plus plus" id= "{{cart.id}}" type="submit">&plus;</button>
+                        </div>
+                      </div>
+                      </div>
+                      
                     </td>
-                    <td><button type="submit" class="btn btn-primary btn-sm px-4" style="margin-left: 40px; height: 35px;">Update</button></td>
-                  </form> 
-                  <td class="total-col"><h4><i class="fa fa-inr" aria-hidden="true"></i>{{cart.sub_total}}</h4></td>
-                  <td style="padding-left: 25px;"><a href="" id = {{cart.id}}  class="btn btn-primary height-auto btn-sm del" style="background-color: transparent; color: #414141; border: none; font-size: 18px;">X</a></td>
+                   
+                  <td class="total-col"><h4 id = "sub_total_{{cart.id}}" style="padding-bottom: 45px;"><i class="fa fa-inr" aria-hidden="true"></i>{{cart.sub_total}}</h4></td>
+                  <td style="padding-left: 25px; padding-bottom: 45px;"><a href="" id = {{cart.id}}  class="btn btn-primary height-auto btn-sm del" style="background-color: transparent; color: #da1717; font-size: 18px;">X</a></td>
 								</tr>
 						 {% endfor %}
 							</tbody>
@@ -153,7 +155,7 @@
                 
                 <div class="row">
                   <div class="col-md-12">
-                  <a class="btn btn-primary btn-sm px-4" href="{% url 'shipping_address' %}" id= "order" style="height: 38px; padding-top: 8px;">Proceed To Checkout</a>
+                  <a class="btn btn-primary btn-sm px-4" href="{% url 'shipping_address' %}" id= "order" style="height: 38px; padding-top: 8px; float: right;">Proceed To Checkout</a>
                   </div>
                 </div>
               </div>
@@ -235,5 +237,64 @@ $(document).ready(function(){
   setTimeout(function(){ 
     message_ele.style.display = "none"; 
   }, 5000);
+</script>
+<script>
+  $(document).ready(function(){
+    $('.minus').click(function(e){
+      var cart_id = e.target.id
+      var cart_qtn = document.getElementById("cart_"+cart_id).value
+      console.log(cart_qtn)
+      e.preventDefault()
+       $.ajax({
+            type:'GET',
+            url: '{% url "cartlists" %}',
+            data:{
+              "cart_id":cart_id,
+              "cart_qtn":cart_qtn,
+          },
+            dataType: 'json',
+            success: function (data) {
+              console.log(data.cart_id)
+              if (data.cart_sub_total_price == data.cart_total_price){
+                  $("#coopon_disc").hide()
+                }
+              $('#sub_total_'+data.cart_id).html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.cart_sub_total)
+              $('#my_discount').html("-<i class='fa fa-inr' aria-hidden='true'></i>"+data.total_discounts)
+              $('#sub_total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.cart_sub_total_price)
+              $('#total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.cart_total_price)
+              
+              console.log("success")
+            }
+        });
+    });         
+})
+</script>
+<script>
+  $(document).ready(function(){
+    $('.plus').click(function(e){
+      console.log(e.target.id)
+      var cart_id = e.target.id
+      var cart_qtn = document.getElementById("cart_"+cart_id).value
+      console.log(cart_qtn)
+      e.preventDefault()
+       $.ajax({
+            type:'GET',
+            url: '{% url "cartlists" %}',
+            data:{
+              "cart_id":cart_id,
+              "cart_qtn":cart_qtn,
+          },
+            dataType: 'json',
+            success: function (data) {
+              console.log(data.cart_item_len)
+              $('#sub_total_'+data.cart_id).html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.cart_sub_total)
+              $('#my_discount').html("-<i class='fa fa-inr' aria-hidden='true'></i>"+data.total_discounts)
+              $('#sub_total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.cart_sub_total_price)
+              $('#total').html("<i class='fa fa-inr' aria-hidden='true'></i>"+data.cart_total_price)
+              console.log("success")
+            }
+        });
+  });         
+})
 </script>
 {% endblock %}

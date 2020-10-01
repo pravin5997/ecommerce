@@ -103,10 +103,8 @@ $(document).ready(function(){
             },
             success: function(result){
                 console.log(result.parent_prod)
-                var data = JSON.parse(result.prod_data)
-                var price = data[0].fields.price
                 var replace_price = document.getElementById('price_'+result.parent_prod) 
-                replace_price.innerHTML = "RS. "+price
+                replace_price.innerHTML = "RS. "+result.prod_data
                 console.log("success")
             },
             error: function(error){

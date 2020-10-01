@@ -8,12 +8,11 @@ fetch("/create-payment-intent", {
   headers: {
     "Content-Type": "application/json"
   },
-
 })
   .then(function (result) {
     return result.json();
   })
-  .then(function(data) {
+  .then(function (data) {
     var elements = stripe.elements();
     var style = {
       base: {
@@ -72,8 +71,7 @@ var payWithCard = function(stripe, card, clientSecret) {
       // Just for the purpose of the sample, show the PaymentIntent response object
       stripe.retrievePaymentIntent(clientSecret).then(function(result) {
         var paymentIntent = result.paymentIntent;
-        var paymentIntentJson = JSON.stringify(paymentIntent, null, 2);
-        
+        var paymentIntentJson = JSON.stringify(paymentIntent);
         // post data and show new page
         var form2 =document.getElementById("payload");
         var input = document.getElementById("data-payload")
@@ -82,17 +80,7 @@ var payWithCard = function(stripe, card, clientSecret) {
         changeLoadingState(false);
       });
     };
-// var orderComplete = function(paymentIntentId) {
-//   loading(false);
-//   document
-//     .querySelector(".result-message a")
-//     .setAttribute(
-//       "href",
-//       "https://dashboard.stripe.com/test/payments/" + paymentIntentId
-//     );
-//   document.querySelector(".result-message").classList.remove("hidden");
-//   document.querySelector("button").disabled = true;
-// };
+
 // Show the customer the error from Stripe if their card fails to charge
 var showError = function(errorMsgText) {
   loading(false);

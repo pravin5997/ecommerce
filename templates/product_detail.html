@@ -8,12 +8,6 @@
     <div class="page-top-info">
 		<div class="container">
 			<h4>Product Page</h4>
-			<!-- <div class="site-pagination" style="padding-top: 20px;">
-				<a href="{% url 'product' %}">Home</a> /
-                <a href="">category</a> /
-                <a href="">subcategory</a> /
-                <a href="">product</a>
-			</div> -->
 		</div>
 	</div>
 
@@ -85,10 +79,8 @@ $(document).ready(function(){
                 csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
             },
             success: function(result){
-                var data = JSON.parse(result.prod_data)
-                var price = data[0].fields.price
                 var replace_price = document.getElementById('price') 
-                replace_price.innerHTML ="Rs. "+ price
+                replace_price.innerHTML ="Rs. "+ result.prod_data
                 console.log("success")
             },
             error: function(error){

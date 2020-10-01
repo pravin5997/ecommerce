@@ -84,10 +84,8 @@ class ProductCategory(View):
                 product_attribute.extend(list(prod_typ.product_attribute.all()))
         product_id = request.POST.get("event")
         if product_id:
-            product = Product.objects.filter(id=product_id)
-            prod_data = serializers.serialize('json', product)
-            for parent_prod in product:
-                return JsonResponse(data={"prod_data": prod_data, "parent_prod": parent_prod.product.id})
+            product = Product.objects.get(id=product_id)
+            return JsonResponse(data={"prod_data": product.price, "parent_prod": product.product.id})
         for product in products_list:
             product_quantity_update(request, product)
         return render(request, self.template_name, {"prod": products_list, "cat_obj":category_obj, "pro_attr":product_attribute})
@@ -101,10 +99,8 @@ class ProductView(ListView):
         products_list = Product.objects.all()
         product_id = request.POST.get("event")
         if product_id:
-            product = Product.objects.filter(id=product_id)
-            prod_data = serializers.serialize('json', product)
-            for parent_prod in product:
-                return JsonResponse(data={"prod_data": prod_data, "parent_prod": parent_prod.product.id})
+            product = Product.objects.get(id=product_id)
+            return JsonResponse(data={"prod_data": product.price, "parent_prod": product.product.id})
         for product in products_list:
             product_quantity_update(request, product)
         return render(request, self.template_name, {"object_list": products_list})
@@ -117,9 +113,8 @@ class ProductDetailView(DetailView):
     def post(self, request, pk):
         product_id = request.POST.get("event")
         if product_id:
-            product = Product.objects.filter(id=int(product_id))
-            prod_data = serializers.serialize('json', product)     
-            return JsonResponse(data={"prod_data": prod_data})  
+            product = Product.objects.get(id=product_id)
+            return JsonResponse(data={"prod_data": product.price})  
         product = Product.objects.get(id=pk)
         cart_obj_list = Cart.objects.filter(user=request.user)
         if not cart_obj_list:
@@ -130,7 +125,7 @@ class ProductDetailView(DetailView):
 def coupon_validation(request, coupon_obj, cart_object):
     if coupon_obj.discount_type == "P":
         coupon_discount = (coupon_obj.discount / 10)
-        total_discount = round((cart_object.total / 10) * int(coupon_discount))
+        total_discount = (cart_object.total / 10) * int(coupon_discount)
         if total_discount > coupon_obj.max_discount:
             total_discount = coupon_obj.max_discount
         cart_object.coupon = coupon_obj
@@ -158,7 +153,7 @@ def coupon_update(request, cart_object):
             coupon_obj =cart_object.coupon
             if coupon_obj.discount_type == "P":
                 coupon_discount = (coupon_obj.discount / 10)
-                total_discount = round((cart_object.total / 10) * int(coupon_discount))
+                total_discount = (cart_object.total / 10) * int(coupon_discount)
                 if total_discount > coupon_obj.max_discount:
                     total_discount = coupon_obj.max_discount
                 cart_object.coupon = coupon_obj
@@ -166,19 +161,26 @@ def coupon_update(request, cart_object):
                 cart_object.save()
 
 
-class CartItemList(View):
+class CartItemList(ListView):
     model = CartItem
     template_name = "cart_list.html"
 
     def get(self, request):
-        cart_object = Cart.objects.get(user=request.user)
-        cart_items = CartItem.objects.filter(cart=cart_object)    
-        cart_price = 0 
-        for cart_item in cart_items:
-            cart_price += cart_item.sub_total
-            cart_object.total = cart_price
-            cart_object.save()
+        cart_object = Cart.objects.get(user=request.user)  
+        cart_object.total = cart_object.get_sub_total()
+        cart_object.save()
         coupon_update(request, cart_object)
+        cart_id = request.GET.get("cart_id")
+        cart_qtns = request.GET.get("cart_qtn")
+        if cart_id and cart_qtns:
+            current_cart_obj = CartItem.objects.get(id=cart_id)
+            current_cart_obj.quantity = int(cart_qtns)
+            current_cart_obj.sub_total = current_cart_obj.get_product_sub_total(int(cart_qtns))
+            current_cart_obj.save()
+            cart_object.total = cart_object.get_sub_total()
+            cart_object.save()
+            coupon_update(request, cart_object)
+            return JsonResponse(data = {"cart_id":current_cart_obj.id, "cart_sub_total_price":cart_object.get_sub_total(), "cart_total_price":cart_object.get_total(),"total_discounts":cart_object.total_discount, "cart_sub_total":current_cart_obj.sub_total, "cart_quantity":current_cart_obj.quantity})
         cart_item_id= request.GET.get('id', None)
         if cart_item_id:
             CartItem.objects.get(id=cart_item_id).delete()
@@ -186,37 +188,25 @@ class CartItemList(View):
             if len(cart_item_obj) == 0:
                 cart_object.total = 0
                 cart_object.save()
-            cart_price = 0
-            for cart_item in cart_item_obj:
-                cart_price += cart_item.sub_total
-                cart_object.total = cart_price
-                cart_object.save()
+            cart_object.total = cart_object.get_sub_total()
+            cart_object.save()
             coupon_update(request, cart_object)
             data = {
                 'id': cart_item_id,
                 "cart_item": len(cart_item_obj),
-                "cart_sub_total": cart_price,
+                "cart_sub_total": cart_object.get_sub_total(),
                 "cart_total":cart_object.get_total(),
                 "cart_discount":cart_object.total_discount
             }
             return JsonResponse(data)
-        return render(request, self.template_name, {"cart_count": cart_items, "cart_object": cart_object})
+        return render(request, self.template_name, {"cart_object": cart_object})
     
     def post(self, request):
         cart_object = Cart.objects.get(user=request.user)
-        cart_items = CartItem.objects.filter(cart = cart_object)
-        cart_price = 0
-        for cart_item in cart_items:
-            product_quantity = request.POST.get(cart_item.product.name)
-            if product_quantity is not None:
-                cart_item.quantity = product_quantity
-                cart_item.sub_total = round(int(cart_item.product.price) * int(product_quantity), 4)
-                cart_item.save()
-            cart_price += cart_item.sub_total
-            cart_object.total = cart_price
-            cart_object.save()
-        sub_total = cart_object.total
+        cart_object.total = cart_object.get_sub_total()
+        cart_object.save()
         coupon_update(request, cart_object)
+      
         my_coupon = request.POST.get("coupon")
         if my_coupon:
             coupon_code = CouponCode.objects.filter(code=my_coupon.upper())
@@ -238,7 +228,7 @@ class CartItemList(View):
                     messages.warning(request, "Please enter valid coupon")
             else:
                 messages.warning(request, "Please enter true coupon")
-        return render(request, self.template_name, {"cart_count": cart_items, "cart_object": cart_object,"sub_total":sub_total})
+        return render(request, self.template_name, {"cart_object": cart_object})
       
 
 class ShippingAddress(View):
@@ -341,7 +331,7 @@ def createpayment(request):
     
     if request.method == "POST":
         intent = stripe.PaymentIntent.create(
-            amount=int(cart.get_total())*100,
+            amount=int(cart.get_total()*100),
             currency="inr",
             )
         return JsonResponse({'publishableKey': settings.STRIPE_PUBLISHABLE_KEY, 'clientSecret': intent.client_secret})

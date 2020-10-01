@@ -67,6 +67,9 @@ class CartItem(models.Model):
     def __str__(self):
         return f"{self.id}"    
 
+    def get_product_sub_total(self, product_quantity):    
+        sub_total = (product_quantity * self.price_per_unit)
+        return sub_total
 
 class Cart(models.Model):
     user = models.ForeignKey(User, related_name="user_cart", on_delete=models.CASCADE, null=True)
@@ -79,6 +82,12 @@ class Cart(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+    def get_sub_total(self):    
+        sub_total = 0
+        for item in self.cart_item.all():
+            sub_total += item.sub_total
+        return sub_total
 
     def get_total(self):
         total = 0
